@@ -175,7 +175,10 @@ int write_all_channel_assignments(unsigned int *tx_buff, unsigned int *asgn_tabl
         #ifdef DEBUG
             std::cout << "Channel " << i << " config transaction value = " << trans_buff << '\n';
         #endif
-
+        // Place the Burst frame header into the first 4 byes of the tx buffer.
+        for(int i = 0; i < 4; i++)
+            tx_buff[i] = byte_buff[i];
+        // Next Write the Aditional 3 Data Bytes to the buffer. 
     }
     return 0;
 }
