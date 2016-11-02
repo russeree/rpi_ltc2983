@@ -26,7 +26,7 @@ unsigned int or_mask_gen(unsigned int value, unsigned int bit_pos);
 int main()
 {
     unsigned int chnl_asgn_map [20] = {}; // Intermap of LTC2983 ADC channel mapping
-    unsigned char spi_tx [100] = {};      // Spi Tansaction buffer, This gets pushed out to the IC and replace with BCM rx spi pin data
+    unsigned char spi_tx [200] = {};      // Spi Tansaction buffer, This gets pushed out to the IC and replace with BCM rx spi pin data
     unsigned int trans_buff;              // Stores a word containing the transaction (32 bit) 
     int sts;
     int spi_chnl;
@@ -36,7 +36,6 @@ int main()
     std::cin  >> spi_chnl;
     // Init the LTC2983 on input SPI channel
     init_ltc2983(spi_chnl);
-    sts =  wiringPiSPIDataRW (spi_chnl, &spi_tx[0], 4);
     // Sets up Thermocouples and Diodes as CJ
     setup_thermocouple(&chnl_asgn_map[CHANNEL_3],  TYPE_K, CJ_CHNL_1,  SNGL, OC_CHK_ON, TC_10UA);
     setup_thermocouple(&chnl_asgn_map[CHANNEL_7],  TYPE_K, CJ_CHNL_5,  SNGL, OC_CHK_ON, TC_10UA);
@@ -49,13 +48,37 @@ int main()
     setup_diode (&chnl_asgn_map[CHANNEL_13], SNGL, CONV_2, D_AVG_OFF, D_10UA, 0b0100000000110001001001);
     setup_diode (&chnl_asgn_map[CHANNEL_17], SNGL, CONV_2, D_AVG_OFF, D_10UA, 0b0100000000110001001001);
     
-    // Print the channel configs
-    for (int i = 0; i < 20; i++) 
-        std::cout << std::bitset<32>(chnl_asgn_map[i]) << '\n';
+    // Generate the bytes for the TXbuffer channel map
+    write_all_channel_assignments(&spi_tx[0], &chnl_asgn_map[0]);
+    sts =  wiringPiSPIDataRW (spi_chnl, &spi_tx[0], 140);
+    
+    spi_tx[0] = 0x03;
+    spi_tx[1] = 0x02;
+    spi_tx[2] = 0x00;
+    spi_tx[3] = 0x00;
 
-    gen_transaction(&trans_buff, READ, 0x0F0F, 0x0A);
-    std::cout << trans_buff << '\n';
+    sts =  wiringPiSPIDataRW (spi_chnl, &spi_tx[0], 4);
+
+    for(int i = 0; i < 20; i++)
+    {
+        for(int j = 0; j < 4; j++)
+        {
+            trans_buff = 0;
+            unsigned short int address = (0x0200 + (4*i) + j);
+            gen_transaction(&trans_buff, READ, 0xff, 0x00);
+            std::cout << std::hex << trans_buff << "\n";
+            std::cout << std::hex << address << "\n";
+            for(int k = 0; k < 4; k++)
+                spi_tx[k-3] = (trans_buff >> (8*k)) & 0xff;
+            sts =  wiringPiSPIDataRW (spi_chnl, &spi_tx[0], 4);
+            for(int k = 0; k < 4; k++)
+                std::cout << spi_tx[k];
+            std::cout << '\n';
+        }
+    }
+
     return 0;
+
 }
 
 // This initializes the LTC2983
@@ -141,13 +164,14 @@ unsigned int or_mask_gen(unsigned int value, unsigned int bit_pos)
     return (value << bit_pos); 
 }
 
-// Generates 32 bits for a SPI transaction to the LTC2983, This is written as a series of 4 byes to the buffer
+// Generates 32 bits for a SPI transaction to the LTC2983, This is written as a series of 4 byes to the buffer *CLEARS BUFFER CONTENTS*
 int gen_transaction(unsigned int *buff, unsigned char trans_type, unsigned short int address, unsigned char data)
 {
+    *buff = 0; 
     unsigned char t_buff [4] = {};
     t_buff[3] = trans_type;
-    t_buff[2] = address & 0xff;
-    t_buff[1] = (address >> 8) & 0xff;
+    t_buff[1] = address & 0xff;
+    t_buff[2] = (address >> 8) & 0xff;
     t_buff[0] = data;
     for (int i = 0; i < 4; i++)
     {
@@ -157,28 +181,40 @@ int gen_transaction(unsigned int *buff, unsigned char trans_type, unsigned short
     return 0;
 }
 
-// This will configure all the channels on the LTC2983 with the channel assignment data table
-int write_all_channel_assignments(unsigned int *tx_buff, unsigned int *asgn_table) 
+// This will configure all the channels on the LTC2983 with the channel assignment data table !!!!TEST ME!!!
+int write_all_channel_assignments(unsigned char *tx_buff, unsigned int *asgn_table) 
 {
-    unsigned int trans_buff;      // Buffers the full tranaction byte to be written to the LTC2983
-    unsigned char byte_buff [4]; // Used to buffer a word into a byte   
+    unsigned int trans_buff = 0;       // Buffers the full tranaction byte to be written to the LTC2983
+    unsigned char byte_buff [4] = {};  // Used to buffer a word into a byte
+    unsigned short int address = 0;    // Address Storage
     // Generate the first transaction to burst from then write all subsequent bytes 
     for(int i = 0; i < 20; i++)
     {
-        // Convert the chaneel DATA into a 4 byte array
-        byte_buff[0] =  asgn_table[i] & 0xff;
-        byte_buff[1] = (asgn_table[i] >> 8) & 0xff;
-        byte_buff[2] = (asgn_table[i] >> 16) & 0xff;
-        byte_buff[3] = (asgn_table[i] >> 24) & 0xff;
+        std::cout << "\nChannel " << i << '\n';
+        address = 0x0200 + (i * 0x04); 
+        // Convert the chaneel assignment into a 4 byte array for DEBUG read back
+        for (int j = 0; j < 4; j++)
+            byte_buff[3-j] = (asgn_table[i] >> j*8) & 0xFF;
+        for (int j = 0; j < 4; j++)
+            std::cout << "Byte " << j << " Channel " << i << " = " << std::bitset<8>(byte_buff[j]) << '\n';
         // Now that the byte has been created with the channel data, write and inital packet conaining the start address, then write the subsequent bytes
-        gen_transaction(&trans_buff, WRITE, (0x0200 + (i * 4)), byte_buff[0]);
+        std::cout << "Byte buffer value 0 = "  << std::bitset<8>(byte_buff[0]) << '\n';
+        std::cout << "Address value = " << std::hex << address << '\n';
+        gen_transaction(&trans_buff, WRITE, address, byte_buff[0]);
         #ifdef DEBUG
-            std::cout << "Channel " << i << " config transaction value = " << trans_buff << '\n';
+            std::cout << "Assignment Table Enrty for Channel " << i << " = " << std::bitset<32>(asgn_table[i]) << '\n';
+            std::cout << "Channel " << std::dec << i << " config transaction value   = " << std::bitset<32>(trans_buff) << '\n';
         #endif
-        // Place the Burst frame header into the first 4 byes of the tx buffer.
-        for(int i = 0; i < 4; i++)
-            tx_buff[i] = byte_buff[i];
-        // Next Write the Aditional 3 Data Bytes to the buffer. 
+        // Place the Burst frame header that was generated into the first 4 byes of the tx buffer. (The document state that aditional data can be written this could be flawed)
+        for(int j = 0; j < 4; j++)
+            tx_buff[(i * 7) + (3 -j)] = ((trans_buff >> j*8) & 0xff);
+        // Next Write the Aditional 3 Data Bytes to the buffer.
+        for(int j = 0; j < 3; j++) 
+            tx_buff[i * 7 + j + 4] = byte_buff[j+1]; 
     }
+    std::cout << "\ncomplete bitstring to be sent:\n";
+    for(int i = 0; i < 140; i++)
+        std::cout << std::bitset<8>(tx_buff[i]); 
+    std::cout << '\n';
     return 0;
 }
