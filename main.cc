@@ -20,14 +20,17 @@ int setup_thermocouple(unsigned int *channel_asgn, unsigned char tc_type, unsign
 int setup_diode(unsigned int *channel_asgn, bool snl_ended, bool three_readings, bool averaging, unsigned char exc_current, unsigned int ideality_f);
 int tx_buffer_stitch (unsigned char *tx_buffer, unsigned char *dat_buffer, int bytes);
 int gen_transaction(unsigned int *buff, unsigned char trans_type, unsigned short int address, unsigned char data);
-int write_all_channel_assignments(unsigned char *tx_buff, unsigned int *asgn_table, int spi_channel); 
+int write_all_channel_assignments(unsigned char *tx_buff, unsigned int *asgn_table, int spi_channel);
+int all_chnnel_conversion(int spi_channel);
+int read_channel_value(int spi_channel, int channel_number); 
 unsigned int or_mask_gen(unsigned int value, unsigned int bit_pos);
 
 int main()
 {
-    unsigned int chnl_asgn_map [20] = {}; // Intermap of LTC2983 ADC channel mapping
-    unsigned char spi_tx [200] = {};      // Spi Tansaction buffer, This gets pushed out to the IC and replace with BCM rx spi pin data
-    unsigned int trans_buff;              // Stores a word containing the transaction (32 bit) 
+    const unsigned int d_ideality_f = 0x00101042; // Diode ideality factor of ~ 1.04
+    unsigned int chnl_asgn_map [20] = {};         // Intermap of LTC2983 ADC channel mapping
+    unsigned char spi_tx [200] = {};              // Spi Tansaction buffer, This gets pushed out to the IC and replace with BCM rx spi pin data
+    unsigned int trans_buff;                      // Stores a word containing the transaction (32 bit) 
     int sts;
     int spi_chnl;
     // Setup Wiring Libs
@@ -37,20 +40,24 @@ int main()
     // Init the LTC2983 on input SPI channel
     init_ltc2983(spi_chnl);
     // Sets up Thermocouples and Diodes as CJ
-    setup_thermocouple(&chnl_asgn_map[CHANNEL_3],  TYPE_K, CJ_CHNL_1,  SNGL, OC_CHK_ON, TC_10UA);
-    setup_thermocouple(&chnl_asgn_map[CHANNEL_7],  TYPE_K, CJ_CHNL_5,  SNGL, OC_CHK_ON, TC_10UA);
-    setup_thermocouple(&chnl_asgn_map[CHANNEL_11], TYPE_K, CJ_CHNL_9,  SNGL, OC_CHK_ON, TC_10UA);
-    setup_thermocouple(&chnl_asgn_map[CHANNEL_15], TYPE_K, CJ_CHNL_13, SNGL, OC_CHK_ON, TC_10UA);
-    setup_thermocouple(&chnl_asgn_map[CHANNEL_19], TYPE_K, CJ_CHNL_17, SNGL, OC_CHK_ON, TC_10UA);
-    setup_diode (&chnl_asgn_map[CHANNEL_1],  SNGL, CONV_2, D_AVG_OFF, D_10UA, 0b0100000000110001001001);
-    setup_diode (&chnl_asgn_map[CHANNEL_5],  SNGL, CONV_2, D_AVG_OFF, D_10UA, 0b0100000000110001001001);
-    setup_diode (&chnl_asgn_map[CHANNEL_9],  SNGL, CONV_2, D_AVG_OFF, D_10UA, 0b0100000000110001001001);
-    setup_diode (&chnl_asgn_map[CHANNEL_13], SNGL, CONV_2, D_AVG_OFF, D_10UA, 0b0100000000110001001001);
-    setup_diode (&chnl_asgn_map[CHANNEL_17], SNGL, CONV_2, D_AVG_OFF, D_10UA, 0b0100000000110001001001);
+    setup_thermocouple(&chnl_asgn_map[CHANNEL_3],  TYPE_K, CJ_CHNL_1,  SNGL, OC_CHK_ON, TC_100UA);
+    setup_thermocouple(&chnl_asgn_map[CHANNEL_7],  TYPE_K, CJ_CHNL_5,  SNGL, OC_CHK_ON, TC_100UA);
+    setup_thermocouple(&chnl_asgn_map[CHANNEL_11], TYPE_K, CJ_CHNL_9,  SNGL, OC_CHK_ON, TC_100UA);
+    setup_thermocouple(&chnl_asgn_map[CHANNEL_15], TYPE_K, CJ_CHNL_13, SNGL, OC_CHK_ON, TC_100UA);
+    setup_thermocouple(&chnl_asgn_map[CHANNEL_19], TYPE_K, CJ_CHNL_17, SNGL, OC_CHK_ON, TC_100UA);
+    setup_diode (&chnl_asgn_map[CHANNEL_1],  SNGL, CONV_2, D_AVG_OFF, D_20UA, d_ideality_f);
+    setup_diode (&chnl_asgn_map[CHANNEL_5],  SNGL, CONV_2, D_AVG_OFF, D_20UA, d_ideality_f);
+    setup_diode (&chnl_asgn_map[CHANNEL_9],  SNGL, CONV_2, D_AVG_OFF, D_20UA, d_ideality_f);
+    setup_diode (&chnl_asgn_map[CHANNEL_13], SNGL, CONV_2, D_AVG_OFF, D_20UA, d_ideality_f);
+    setup_diode (&chnl_asgn_map[CHANNEL_17], SNGL, CONV_2, D_AVG_OFF, D_20UA, d_ideality_f);
     
+
+
+
     // Generate the bytes for the TXbuffer channel map
     write_all_channel_assignments(&spi_tx[0], &chnl_asgn_map[0], spi_chnl);
-
+    
+    // Read-Back Channel Table
     for(int i = 0; i < 20; i++)
     {
         for(int j = 0; j < 4; j++)
@@ -65,6 +72,10 @@ int main()
             sts =  wiringPiSPIDataRW (spi_chnl, &spi_tx[0], 4);
         }
     }
+    
+    // Perform a conversion
+    all_chnnel_conversion(spi_chnl);
+    read_channel_value(spi_chnl, CHANNEL_3);
 
     return 0;
 
@@ -74,6 +85,8 @@ int main()
 int init_ltc2983 (int spi_channel)
 {
     int status;
+    unsigned char spi_tx [4] = {}; // Spi Tansaction buffer, This gets pushed out to the IC and replace with BCM rx spi pin data
+    unsigned int trans_buff;
     // Check to make sure the spi channel exists return 2;
     if ((spi_channel > 1) | (spi_channel < 0))
     {
@@ -87,13 +100,18 @@ int init_ltc2983 (int spi_channel)
     pinMode(26, OUTPUT);
     digitalWrite(26, HIGH);
     delay(300);
-
     // Setup SPI based on the SS channel R[12,13] is jumped to. [Will print errors]
     if (wiringPiSPISetup (spi_channel, 500000) < 0)
     {
       fprintf (stderr, "SPI Setup failed: %s\n", strerror (errno));
       return 1; 
     }
+    // Setup the device in Fahrenheit mode with 50/60HZ Rejection filters both enabled.  
+    gen_transaction(&trans_buff, WRITE, 0x00F0, 0b00000100);
+    for(int k = 0; k < 4; k++)
+        spi_tx[3-k] = (trans_buff >> (8*k)) & 0xff;
+    // Write the Global Configuration register
+    status = wiringPiSPIDataRW (spi_channel, &spi_tx[0], 4);
     return 0;
 }
 
@@ -198,6 +216,60 @@ int write_all_channel_assignments(unsigned char *tx_buff, unsigned int *asgn_tab
                 byte_null[3-k] = (trans_buff >> (8*k)) & 0xff;
             wiringPiSPIDataRW (spi_channel, &byte_null[0], 4);
         }
+    }
+    return 0;
+}
+
+// Initiate a complete converstion on all channels (No ARGS)
+int all_chnnel_conversion(int spi_channel)
+{
+    unsigned int temp = 0;
+    unsigned char tx_buff [4];
+    unsigned int all_mask = 0x000FFFFF;
+    unsigned short int address = 0x00F4;
+    pinMode(19, INPUT);
+    for(int i = 0; i < 4; i++)
+    {
+        gen_transaction(&temp, WRITE, (address + i), (all_mask >> (32-(8*i)) & 0xff));
+        std::cout << "Mask Byte " << i << " = " << std::bitset<32>(temp) << '\n';
+        for(int j = 0; j < 4; j++)
+        {
+            tx_buff[3-j] = (temp >> (8*j)) & 0xff;
+        }
+        for(int j = 0; j < 4; j++)
+        {
+            std::cout << "Packet Byte " << j << " = " << std::bitset<8>(tx_buff[j]) << '\n'; 
+        }
+        wiringPiSPIDataRW (spi_channel, &tx_buff[0], 4);
+    }
+    gen_transaction(&temp, WRITE, 0x0000, 0x80);
+    for(int i = 0; i < 4; i++)
+        tx_buff[3-i] = (temp >> (8*i)) & 0xff;
+    wiringPiSPIDataRW (spi_channel, &tx_buff[0], 4);
+    while(!digitalRead(19));
+    std::cout << "conversion_complete\n";
+    return 0;
+}
+
+// Channels start at 0
+int read_channel_value(int spi_channel, int channel_number)
+{
+    unsigned short int base_addr = 0x0010;
+    unsigned int trans_buff;
+    unsigned char tx_buff[4];
+    unsigned char res_buff[4];
+    for (int i = 0; i < 4; i++)
+    {
+        gen_transaction(&trans_buff, READ, (base_addr + 4*channel_number + i), 0x00);
+        for(int j = 0; j < 4; j++)
+            tx_buff[3-j] = (trans_buff >> (8*j)) & 0xff;
+        wiringPiSPIDataRW (spi_channel, &tx_buff[0], 4);
+        res_buff[i] = tx_buff[3];
+
+    }
+    for (int i = 0; i < 4; i++)
+    {
+        std::cout << "Valye of MSB-" << i << " = " << std::bitset<8>(res_buff[i]) << '\n';
     }
     return 0;
 }
