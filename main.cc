@@ -62,31 +62,14 @@ int main()
     // Generate the bytes for the TXbuffer channel map
     write_all_channel_assignments(&spi_tx[0], &chnl_asgn_map[0], spi_chnl);
     
-    // Read-Back Channel Table
-    for(int i = 0; i < 20; i++)
-    {
-        for(int j = 0; j < 4; j++)
-        {
-            trans_buff = 0;
-            unsigned short int address = (0x0200 + (4*i) + j);
-            gen_transaction(&trans_buff, READ, address, 0x00);
-            for(int k = 0; k < 4; k++)
-            {
-                spi_tx[3-k] = (trans_buff >> (8*k)) & 0xff;
-            }
-            sts =  wiringPiSPIDataRW (spi_chnl, &spi_tx[0], 4);
-        }
-    }
-    
     // Perform a conversion
     all_chnnel_conversion(spi_chnl);
-    read_channel_raw_value(spi_chnl, CHANNEL_3, &spi_tx[0]);
-    read_data(CNV_RSLTS, &spi_rx[0], 80, spi_chnl);
     get_command_status(spi_chnl);
-    temperature = read_channel_double(spi_chnl, 0);
-    std::cout << "The temperature of channel 0 = " << temperature << "\n";
-    temperature = read_channel_double(spi_chnl, 2);
-    std::cout << "The temperature of channel 3 = " << temperature << "\n";
+    for(int i = 0; i < 20; i++)
+    {
+        temperature = read_channel_double(spi_chnl, i);
+        std::cout << "The temperature of channel " << i << " = " << temperature << "\n";
+    }
 
     return 0;
 
@@ -236,12 +219,15 @@ int all_chnnel_conversion(int spi_channel)
 {
     unsigned int temp = 0;
     unsigned char tx_buff [4];
+    unsigned char dat_buff; 
     unsigned int all_mask = 0x000FFFFF;
     unsigned short int address = 0x00F4;
     pinMode(19, INPUT);
     for(int i = 0; i < 4; i++)
     {
-        gen_transaction(&temp, WRITE, (address + i), (all_mask >> (32-(8*i)) & 0xff));
+        dat_buff = ((all_mask >> (24-8*i)) & 0xff);
+        gen_transaction(&temp, WRITE, (address + i), dat_buff);
+        std::cout << "Writing byte : " << std::bitset<8>(dat_buff) << '\n';
         for(int j = 0; j < 4; j++)
         {
             tx_buff[3-j] = (temp >> (8*j)) & 0xff;
@@ -281,7 +267,7 @@ int read_channel_raw_value(int spi_channel, int channel_number, unsigned char *r
 int read_data (unsigned short int address, unsigned char *results, unsigned int bytes, unsigned int spi_channel)
 {
     unsigned int tx_buff;          // Stores the complete transaction
-    unsigned char tx[bytes] = {};  // you could use your results pointer but mem is cheap
+    unsigned char tx[bytes * 4] = {};  // you could use your results pointer but mem is cheap
     for(int i = 0; i < bytes; i++)
     { 
         tx_buff = 0;
@@ -349,9 +335,10 @@ float read_channel_double(int spi_channel, int channel_number)
     unsigned int result;
     float temperature; 
     bool sign;
-    unsigned char chnl_dat_buff[0];
+    unsigned char chnl_dat_buff[4];
+    unsigned short int conversion_result_address = (0x0010 + (4 * channel_number));
     // Read out the channel information from the SPI bus. 
-    read_channel_raw_value(spi_channel, channel_number, &chnl_dat_buff[0]);
+    status = read_data(conversion_result_address, &chnl_dat_buff[0], 4, spi_channel);
     // Now that the channel data buffer is filled check for errors
     if (ltc_2983_channel_err_decode(spi_channel, channel_number)  != 0)
     {
@@ -360,13 +347,18 @@ float read_channel_double(int spi_channel, int channel_number)
     }
     else
     {
+        for(int i = 0; i < 4; i++)
+        {
+            std::cout << "Raw read value of channel " << channel_number << " byte " << i << " = " << std::bitset<8>(chnl_dat_buff[i]) << '\n'; 
+        }
+
         result = 0;
-        result = result | ((unsigned int) chnl_dat_buff[0]<<16)
-                        | ((unsigned int) chnl_dat_buff[1]<<8)
-                        | ((unsigned int) chnl_dat_buff[2]);
+        result = result | ((unsigned int) chnl_dat_buff[1]<<16)
+                        | ((unsigned int) chnl_dat_buff[2]<<8)
+                        | ((unsigned int) chnl_dat_buff[3]);
         std::cout << "Raw bin of result = " << std::bitset<32>(result) << "\n";
         // Convert a 24bit 2s compliment into a 32bit 2s compliment number
-        if ((chnl_dat_buff[2]&0b10000000)==128) 
+        if ((chnl_dat_buff[1]&0b10000000)==128) 
             sign=true; 
         else sign=false;
         // append 1s to the MSB 8 bits
@@ -390,19 +382,32 @@ int ltc_2983_channel_err_decode(int spi_channel, int channel_number)
     int status;
     unsigned char sensor_type;
     unsigned char conversion_status;
-    unsigned short int channel_assignment_address = (0x0200 + (4 * channel_number));
     unsigned short int conversion_result_address = (0x0010 + (4 * channel_number));
     unsigned int error_bit_pos;
     std::string error_string[8] = {"VALID", "ADC OUT OF RANGE", "SENSOR UNDER RANGE", "SENSOR OVER RANGE", "CJ SOFT FAULT", "CJ HARD FAULT", "HARD ADC OUT OF RANGE", "SENSOR HARD FAULT"};
     // Readback the channel configuration
-    status = read_data(channel_assignment_address, &sensor_type, 1, spi_channel);
     status = read_data(conversion_result_address, &conversion_status, 1, spi_channel);
+    std::cout << "The conversion status = " << std::bitset<8>(conversion_status) << '\n'; 
+    switch (conversion_status)
+    {
+        case 0x00:
+        {            
+        }
+        case 0x01: 
+        {
+            #ifdef DEBUG
+            std::cout << "Conversion on channel " << channel_number << " is valid.\n";
+            #endif
+            return 0;
+        }
+    }
+
     // Now shit away the 3 LSB to generate a numberal value that represents the sensor type 
-    sensor_type = sensor_type >> 3;
     for(int i = 0; i < 7; i++)
     {
-        if((i == 0) & (conversion_status & 0x01))
+        if((i == 0) && (conversion_status == 0x01))
         {
+            std::cout << "Valid Data Detector Output: ";
             error_bit_pos = 0;
             #ifdef DEBUG
             std::cout << "Conversion on channel " << channel_number << " is valid.\n";
@@ -411,7 +416,8 @@ int ltc_2983_channel_err_decode(int spi_channel, int channel_number)
         }
         else
         {
-            if((conversion_status >> i) & 0x01)
+            std::cout << "Conversion Print out ";
+            if(bool tst = (conversion_status >> i) & 0x01)
             {
                 error_bit_pos = i;
                 #ifdef DEBUG
