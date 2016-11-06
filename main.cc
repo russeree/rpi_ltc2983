@@ -84,6 +84,9 @@ int main()
     read_data(CNV_RSLTS, &spi_rx[0], 80, spi_chnl);
     get_command_status(spi_chnl);
     temperature = read_channel_double(spi_chnl, 0);
+    std::cout << "The temperature of channel 0 = " << temperature << "\n";
+    temperature = read_channel_double(spi_chnl, 2);
+    std::cout << "The temperature of channel 3 = " << temperature << "\n";
 
     return 0;
 
@@ -358,10 +361,10 @@ float read_channel_double(int spi_channel, int channel_number)
     else
     {
         result = 0;
-        result = result | ((unsigned int) chnl_dat_buff[2]<<16)
+        result = result | ((unsigned int) chnl_dat_buff[0]<<16)
                         | ((unsigned int) chnl_dat_buff[1]<<8)
-                        | ((unsigned int) chnl_dat_buff[0]);
-
+                        | ((unsigned int) chnl_dat_buff[2]);
+        std::cout << "Raw bin of result = " << std::bitset<32>(result) << "\n";
         // Convert a 24bit 2s compliment into a 32bit 2s compliment number
         if ((chnl_dat_buff[2]&0b10000000)==128) 
             sign=true; 
@@ -370,7 +373,7 @@ float read_channel_double(int spi_channel, int channel_number)
         if (sign) 
             result = result | 0xFF000000;
         // Compensate for precision
-        temperature = float(result)/1024;
+        temperature = float(result) / 1024;
 
         return temperature;  
     }
