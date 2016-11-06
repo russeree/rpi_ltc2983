@@ -25,9 +25,10 @@ int tx_buffer_stitch (unsigned char *tx_buffer, unsigned char *dat_buffer, int b
 int gen_transaction(unsigned int *buff, unsigned char trans_type, unsigned short int address, unsigned char data);
 int write_all_channel_assignments(unsigned char *tx_buff, unsigned int *asgn_table, int spi_channel);
 int all_chnnel_conversion(int spi_channel);
-int read_channel_value(int spi_channel, int channel_number, unsigned char *results);
+int read_channel_raw_value(int spi_channel, int channel_number, unsigned char *results);
+double read_channel_double(int spi_channel, int channel_number); 
 unsigned int or_mask_gen(unsigned int value, unsigned int bit_pos);
-int bin_to_temp(unsigned int *results, double output, unsigned int channel);  
+int bin_to_te(unsigned int *results, double output, unsigned int channel);
 
 int main()
 {
@@ -78,7 +79,7 @@ int main()
     
     // Perform a conversion
     all_chnnel_conversion(spi_chnl);
-    read_channel_value(spi_chnl, CHANNEL_3, &spi_tx[0]);
+    read_channel_raw_value(spi_chnl, CHANNEL_3, &spi_tx[0]);
     read_data(CNV_RSLTS, &spi_rx[0], 80, spi_chnl);
     get_command_status(spi_chnl);
 
@@ -252,7 +253,7 @@ int all_chnnel_conversion(int spi_channel)
 }
 
 // Channels start at 0
-int read_channel_value(int spi_channel, int channel_number, unsigned char *results)
+int read_channel_raw_value(int spi_channel, int channel_number, unsigned char *results)
 {
     unsigned short int base_addr = 0x0010;
     unsigned int trans_buff;
@@ -277,7 +278,7 @@ int read_channel_value(int spi_channel, int channel_number, unsigned char *resul
 int bin_to_temp(unsigned int *results, double output, unsigned int channel)
 {
     // Read out the channel configuration
-
+    
     return 0; 
 }
 
@@ -312,6 +313,9 @@ int get_command_status(int spi_channel)
     int status;
     unsigned char status_reg;
     read_data(0x0000, &status_reg, 1, spi_channel);
+    #ifdef DEBUG
+    std::cout << "Command register read and ";
+    #endif
     switch(status_reg)
     {
         case 0x80: 
@@ -333,7 +337,7 @@ int get_command_status(int spi_channel)
         default: 
         {
             #ifdef DEBUG
-            std::cout << "Result " << std::bitset<8>(status_reg) << " was not defined as a valid response.\n";
+            std::cout << "result " << std::bitset<8>(status_reg) << " was not defined as a valid response.\n";
             #endif
             status = 3;
             break;
@@ -341,3 +345,15 @@ int get_command_status(int spi_channel)
     }
     return status;
 }
+
+/**
+ * @desc: Reads the channel value out and will return a double with the results, prints errors
+ * @param: [spi_channel] SPI channel used for transactions
+ * @param: [channel_number] Channel number of conversion to be read from
+ **/
+double read_channel_double(int spi_channel, int channel_number)
+{
+    double result = 0;
+    return result;
+}
+
