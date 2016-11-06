@@ -7,8 +7,8 @@
 #define READ        0x03
 
 // BASE ADDRESS MAP
-#define CNV_RSLTS   0x010                 // START: 0x010 -> END: 0x05F [Word]
-#define CHNL_MAP    0x200                 // START: 0x200 -> END: 0x24F [Word]
+#define CNV_RSLTS   0x0010                 // START: 0x010 -> END: 0x05F [Word]
+#define CHNL_MAP    0x0200                 // START: 0x200 -> END: 0x24F [Word]
 
 // TC SE/DIFF VALS
 #define SNGL        true
