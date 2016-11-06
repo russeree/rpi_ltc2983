@@ -2,6 +2,8 @@
 #include <iostream>
 #include <bitset>
 #include <cmath>
+#include <fstream>
+
 // C LIBS
 #include <string.h>
 #include <errno.h>
@@ -14,7 +16,8 @@
 // CREATED C LIBS 
 #include "ltc2983.h"
 
-#define DEBUG
+// #define DEBUG // Default Debug verbosity: 
+// #define DEBUG_L1 // DEBUG Verbosity of level 1: Extended error messages: Byte level transation and buffer readouts 
 
 int init_ltc2983 (int spi_channel);
 int get_command_status(int spi_channel);  
@@ -32,6 +35,8 @@ unsigned int or_mask_gen(unsigned int value, unsigned int bit_pos);
 
 int main()
 {
+    std::ofstream results;
+    results.open("results.txt");
     const unsigned int d_ideality_f = 0x00101042; // Diode ideality factor of ~ 1.04
     unsigned int chnl_asgn_map [20] = {};         // Intermap of LTC2983 ADC channel mapping
     unsigned char spi_tx [200] = {};              // SPI Tansaction buffer, This gets pushed out to the IC and replace with BCM rx spi pin data
@@ -53,11 +58,11 @@ int main()
     setup_thermocouple(&chnl_asgn_map[CHANNEL_11], TYPE_K, CJ_CHNL_9,  SNGL, OC_CHK_ON, TC_100UA);
     setup_thermocouple(&chnl_asgn_map[CHANNEL_15], TYPE_K, CJ_CHNL_13, SNGL, OC_CHK_ON, TC_100UA);
     setup_thermocouple(&chnl_asgn_map[CHANNEL_19], TYPE_K, CJ_CHNL_17, SNGL, OC_CHK_ON, TC_100UA);
-    setup_diode (&chnl_asgn_map[CHANNEL_1],  SNGL, CONV_3, D_AVG_OFF, D_20UA, d_ideality_f);
-    setup_diode (&chnl_asgn_map[CHANNEL_5],  SNGL, CONV_3, D_AVG_OFF, D_20UA, d_ideality_f);
-    setup_diode (&chnl_asgn_map[CHANNEL_9],  SNGL, CONV_3, D_AVG_OFF, D_20UA, d_ideality_f);
-    setup_diode (&chnl_asgn_map[CHANNEL_13], SNGL, CONV_3, D_AVG_OFF, D_20UA, d_ideality_f);
-    setup_diode (&chnl_asgn_map[CHANNEL_17], SNGL, CONV_3, D_AVG_OFF, D_20UA, d_ideality_f);
+    setup_diode (&chnl_asgn_map[CHANNEL_1],  SNGL, CONV_2, D_AVG_OFF, D_20UA, d_ideality_f);
+    setup_diode (&chnl_asgn_map[CHANNEL_5],  SNGL, CONV_2, D_AVG_OFF, D_20UA, d_ideality_f);
+    setup_diode (&chnl_asgn_map[CHANNEL_9],  SNGL, CONV_2, D_AVG_OFF, D_20UA, d_ideality_f);
+    setup_diode (&chnl_asgn_map[CHANNEL_13], SNGL, CONV_2, D_AVG_OFF, D_20UA, d_ideality_f);
+    setup_diode (&chnl_asgn_map[CHANNEL_17], SNGL, CONV_2, D_AVG_OFF, D_20UA, d_ideality_f);
     
     // Generate the bytes for the TXbuffer channel map
     write_all_channel_assignments(&spi_tx[0], &chnl_asgn_map[0], spi_chnl);
@@ -65,12 +70,18 @@ int main()
     // Perform a conversion
     all_chnnel_conversion(spi_chnl);
     get_command_status(spi_chnl);
-    for(int i = 0; i < 20; i++)
+    for(int i = 0; i < 1800; i++)
     {
-        temperature = read_channel_double(spi_chnl, i);
-        std::cout << "The temperature of channel " << i << " = " << temperature << "\n";
+        all_chnnel_conversion(spi_chnl);
+        get_command_status(spi_chnl);
+        temperature = read_channel_double(spi_chnl, 2);
+        if(temperature == 9000)
+            std::cout << "The temperature of channel " << 2 << " = ERROR" << "\n";
+        else
+            std::cout << "The temperature of channel " << 2 << " = " << temperature << "\n";
+        results << temperature << '\n';
     }
-
+    results.close();
     return 0;
 
 }
@@ -202,7 +213,7 @@ int write_all_channel_assignments(unsigned char *tx_buff, unsigned int *asgn_tab
             for(int k = 0; k < 4; k++)
                 byte_null[k] = byte_buff[k]; 
             address = (0x0200 + i*4 + j);
-            #ifdef DEBUG
+            #ifdef DEBUG_L1
             std::cout << "Contentes of byte[" << j << "] tansacton = " << std::bitset<8>(byte_null[j]) << '\n';
             #endif
             gen_transaction(&trans_buff, WRITE, address, byte_null[j]);
@@ -220,14 +231,16 @@ int all_chnnel_conversion(int spi_channel)
     unsigned int temp = 0;
     unsigned char tx_buff [4];
     unsigned char dat_buff; 
-    unsigned int all_mask = 0x000FFFFF;
+    unsigned int all_mask = 0x00000004;
     unsigned short int address = 0x00F4;
     pinMode(19, INPUT);
     for(int i = 0; i < 4; i++)
     {
         dat_buff = ((all_mask >> (24-8*i)) & 0xff);
         gen_transaction(&temp, WRITE, (address + i), dat_buff);
-        std::cout << "Writing byte : " << std::bitset<8>(dat_buff) << '\n';
+        #ifdef DEBUG_L1
+        std::cout << "Writing multi channel conversion mask byte " << i << ": " << std::bitset<8>(dat_buff) << '\n';
+        #endif 
         for(int j = 0; j < 4; j++)
         {
             tx_buff[3-j] = (temp >> (8*j)) & 0xff;
@@ -239,7 +252,9 @@ int all_chnnel_conversion(int spi_channel)
         tx_buff[3-i] = (temp >> (8*i)) & 0xff;
     wiringPiSPIDataRW (spi_channel, &tx_buff[0], 4);
     while(!digitalRead(19));
+    #ifdef DEBUG
     std::cout << "conversion_complete\n";
+    #endif
     return 0;
 }
 
@@ -342,21 +357,26 @@ float read_channel_double(int spi_channel, int channel_number)
     // Now that the channel data buffer is filled check for errors
     if (ltc_2983_channel_err_decode(spi_channel, channel_number)  != 0)
     {
+        #ifdef DEBUG
         std::cout << "Result on channel " << channel_number << " is invalid.\n";
+        #endif 
         return 9000; 
     }
     else
     {
+        #ifdef DEBUG_L1
         for(int i = 0; i < 4; i++)
         {
             std::cout << "Raw read value of channel " << channel_number << " byte " << i << " = " << std::bitset<8>(chnl_dat_buff[i]) << '\n'; 
         }
-
+        #endif
         result = 0;
         result = result | ((unsigned int) chnl_dat_buff[1]<<16)
                         | ((unsigned int) chnl_dat_buff[2]<<8)
                         | ((unsigned int) chnl_dat_buff[3]);
+        #ifdef DEBUG_L1 
         std::cout << "Raw bin of result = " << std::bitset<32>(result) << "\n";
+        #endif
         // Convert a 24bit 2s compliment into a 32bit 2s compliment number
         if ((chnl_dat_buff[1]&0b10000000)==128) 
             sign=true; 
@@ -387,11 +407,14 @@ int ltc_2983_channel_err_decode(int spi_channel, int channel_number)
     std::string error_string[8] = {"VALID", "ADC OUT OF RANGE", "SENSOR UNDER RANGE", "SENSOR OVER RANGE", "CJ SOFT FAULT", "CJ HARD FAULT", "HARD ADC OUT OF RANGE", "SENSOR HARD FAULT"};
     // Readback the channel configuration
     status = read_data(conversion_result_address, &conversion_status, 1, spi_channel);
-    std::cout << "The conversion status = " << std::bitset<8>(conversion_status) << '\n'; 
     switch (conversion_status)
     {
-        case 0x00:
-        {            
+        case 0xFF:
+        {         
+            #ifdef DEBUG
+            std::cout << "Sensor conversion on channel " << channel_number << " status byte returned 0xFF: ALL ERROR BITS AND VLIAD FLAGGED\n";
+            #endif
+            return 1; 
         }
         case 0x01: 
         {
@@ -400,36 +423,28 @@ int ltc_2983_channel_err_decode(int spi_channel, int channel_number)
             #endif
             return 0;
         }
-    }
-
-    // Now shit away the 3 LSB to generate a numberal value that represents the sensor type 
-    for(int i = 0; i < 7; i++)
-    {
-        if((i == 0) && (conversion_status == 0x01))
+        case 0x00:
         {
-            std::cout << "Valid Data Detector Output: ";
-            error_bit_pos = 0;
             #ifdef DEBUG
-            std::cout << "Conversion on channel " << channel_number << " is valid.\n";
+            std::cout << "No conversion on channel " << channel_number << " occoured.\n";
             #endif
-            return 0;
+            return 3;
         }
-        else
+        default:
         {
-            std::cout << "Conversion Print out ";
-            if(bool tst = (conversion_status >> i) & 0x01)
+            #ifdef DEBUG
+            std::cout << "Conversion on channel " << channel_number << " contained the following errors.\n";
+            for(int i = 0; i < 7; i ++)
             {
-                error_bit_pos = i;
-                #ifdef DEBUG
-                std::cout << "Error found in bit position " << i << " on channel " << channel_number << " with error " << error_string[i] << '\n'; 
-                #endif
-                return 1;
+                if((conversion_status >> i) & 0x01)
+                {
+                    std::cout << error_string[i] << '\n'; 
+                }
             }
-            else
-            {
-                return 2;
-            }
+            #endif
+            return 2; 
         }
     }
-    return 3;
+    // If you get here you have problems.
+    return 4;
 }
