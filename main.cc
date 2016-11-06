@@ -26,9 +26,9 @@ int gen_transaction(unsigned int *buff, unsigned char trans_type, unsigned short
 int write_all_channel_assignments(unsigned char *tx_buff, unsigned int *asgn_table, int spi_channel);
 int all_chnnel_conversion(int spi_channel);
 int read_channel_raw_value(int spi_channel, int channel_number, unsigned char *results);
+int ltc_2983_channel_err_decode(int spi_channel, int channel_number); 
 double read_channel_double(int spi_channel, int channel_number); 
 unsigned int or_mask_gen(unsigned int value, unsigned int bit_pos);
-int bin_to_te(unsigned int *results, double output, unsigned int channel);
 
 int main()
 {
@@ -270,19 +270,6 @@ int read_channel_raw_value(int spi_channel, int channel_number, unsigned char *r
 }
 
 /**
- * @desc: Convert channel data to a real number
- * @param: [results] Points to the output byte of the the LTC2983
- * @param: [output] Points to the output double that contains the real num temp result
- * @param: [channe] The channel number of results to be converted: this is used to get the insturment type and catch errors
- **/
-int bin_to_temp(unsigned int *results, double output, unsigned int channel)
-{
-    // Read out the channel configuration
-    
-    return 0; 
-}
-
-/**
  * @desc: Reads a word over SPI
  * @param: [address] The address you want to begin the word read from; 
  **/
@@ -353,7 +340,68 @@ int get_command_status(int spi_channel)
  **/
 double read_channel_double(int spi_channel, int channel_number)
 {
-    double result = 0;
+    int status;
+    double result;
+    unsigned char chnl_dat_buff[0];
+    // Read out the channel information from the SPI bus. 
+    read_channel_raw_value(spi_channel, channel_number, &chnl_dat_buff[0]);
+    // Now that the channel data buffer is filled check for errors
+    if (ltc_2983_channel_err_decode(spi_channel, channel_number)  != 0)
+    {
+        std::cout << "Result on channel " << channel_number << " is invalid.\n";
+        return 9000; 
+    }
+    else
+    {
+                
+    }
     return result;
 }
 
+/**
+ * @desc: Reads the channels data configuration from the IC and Conversion status byte. 
+ * @param: [spi_channel] spi channel to retrive channel_config from
+ * @note: Errors could and should be enumerated at some point but for now they will just be a series of values; LSB = 0 MSB = 7
+ **/
+int ltc_2983_channel_err_decode(int spi_channel, int channel_number)
+{
+    int status;
+    unsigned char sensor_type;
+    unsigned char conversion_status;
+    unsigned short int channel_assignment_address = (0x0200 + (4 * channel_number));
+    unsigned short int conversion_result_address = (0x0010 + (4 * channel_number));
+    unsigned int error_bit_pos;
+    std::string error_string[8] = {"VALID", "ADC OUT OF RANGE", "SENSOR UNDER RANGE", "SENSOR OVER RANGE", "CJ SOFT FAULT", "CJ HARD FAULT", "HARD ADC OUT OF RANGE", "SENSOR HARD FAULT"};
+    // Readback the channel configuration
+    status = read_data(channel_assignment_address, &sensor_type, 1, spi_channel);
+    status = read_data(conversion_result_address, &conversion_status, 1, spi_channel);
+    // Now shit away the 3 LSB to generate a numberal value that represents the sensor type 
+    sensor_type = sensor_type >> 3;
+    for(int i = 0; i < 7; i++)
+    {
+        if((i == 0) & (conversion_status & 0x01))
+        {
+            error_bit_pos = 0;
+            #ifdef DEBUG
+            std::cout << "Conversion on channel " << channel_number << " is valid.\n";
+            #endif
+            return 0;
+        }
+        else
+        {
+            if((conversion_status >> i) & 0x01)
+            {
+                error_bit_pos = i;
+                #ifdef DEBUG
+                std::cout << "Error found in bit position " << i << " on channel " << channel_number << " with error " << error_string[i] << '\n'; 
+                #endif
+                return 1;
+            }
+            else
+            {
+                return 2;
+            }
+        }
+    }
+    return 3;
+}
