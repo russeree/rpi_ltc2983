@@ -27,7 +27,7 @@ int write_all_channel_assignments(unsigned char *tx_buff, unsigned int *asgn_tab
 int all_chnnel_conversion(int spi_channel);
 int read_channel_raw_value(int spi_channel, int channel_number, unsigned char *results);
 int ltc_2983_channel_err_decode(int spi_channel, int channel_number); 
-double read_channel_double(int spi_channel, int channel_number); 
+float read_channel_double(int spi_channel, int channel_number); 
 unsigned int or_mask_gen(unsigned int value, unsigned int bit_pos);
 
 int main()
@@ -37,6 +37,7 @@ int main()
     unsigned char spi_tx [200] = {};              // SPI Tansaction buffer, This gets pushed out to the IC and replace with BCM rx spi pin data
     unsigned char spi_rx [200] = {};              // SPI rx buffer for read data transactions
     unsigned int trans_buff;                      // Stores a word containing the transaction (32 bit)
+    float temperature;                            // Final temperature
 
     int sts;
     int spi_chnl;
@@ -82,6 +83,7 @@ int main()
     read_channel_raw_value(spi_chnl, CHANNEL_3, &spi_tx[0]);
     read_data(CNV_RSLTS, &spi_rx[0], 80, spi_chnl);
     get_command_status(spi_chnl);
+    temperature = read_channel_double(spi_chnl, 0);
 
     return 0;
 
@@ -338,10 +340,12 @@ int get_command_status(int spi_channel)
  * @param: [spi_channel] SPI channel used for transactions
  * @param: [channel_number] Channel number of conversion to be read from
  **/
-double read_channel_double(int spi_channel, int channel_number)
+float read_channel_double(int spi_channel, int channel_number)
 {
     int status;
-    double result;
+    unsigned int result;
+    float temperature; 
+    bool sign;
     unsigned char chnl_dat_buff[0];
     // Read out the channel information from the SPI bus. 
     read_channel_raw_value(spi_channel, channel_number, &chnl_dat_buff[0]);
@@ -353,9 +357,24 @@ double read_channel_double(int spi_channel, int channel_number)
     }
     else
     {
-                
+        result = 0;
+        result = result | ((unsigned int) chnl_dat_buff[2]<<16)
+                        | ((unsigned int) chnl_dat_buff[1]<<8)
+                        | ((unsigned int) chnl_dat_buff[0]);
+
+        // Convert a 24bit 2s compliment into a 32bit 2s compliment number
+        if ((chnl_dat_buff[2]&0b10000000)==128) 
+            sign=true; 
+        else sign=false;
+        // append 1s to the MSB 8 bits
+        if (sign) 
+            result = result | 0xFF000000;
+        // Compensate for precision
+        temperature = float(result)/1024;
+
+        return temperature;  
     }
-    return result;
+    return 9001;
 }
 
 /**
