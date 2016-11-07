@@ -3,11 +3,12 @@
 #include <bitset>
 #include <cmath>
 #include <fstream>
+#include <thread>
 
 // C LIBS
 #include <sys/socket.h>
 #include <sys/types.h>
-#include <netinet/in.h>
+#include <netinet/in.h> // Structs needed for internet and domain address.
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -24,6 +25,9 @@
 
 // #define DEBUG // Default Debug verbosity:
 // #define DEBUG_L1 // DEBUG Verbosity of level 1: Extended error messages: Byte level transation and buffer readouts
+
+int sock_server(unsigned int port);
+void error(const char *msg);
 
 int main(int argc, char *argv[])
 {
@@ -76,3 +80,26 @@ int main(int argc, char *argv[])
     results.close();
     return 0;
 }
+
+int sock_server(unsigned int port)
+{
+    // Vars needed for socket
+    int sockfd, newsockfd, portno, n;
+    socklen_t clilen;
+    char buffer[256];
+    // Socket Connection info into buffer
+    struct sockaddr_in serv_addr, cli_addr;
+    // Open a socket file descriptor
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if(sock_fd < 0)
+        error("ERROR opening socket");
+    return 0;
+
+}
+
+void error(const char *msg)
+{
+    perror(msg);
+    exit(1);
+}
+
