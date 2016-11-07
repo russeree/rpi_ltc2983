@@ -1,22 +1,6 @@
 #ifndef LTC2983
 #define LTC2983
 
-// Functions for LTC2983
-int init_ltc2983 (int spi_channel);
-int get_command_status(int spi_channel);
-int read_data (unsigned short int address, unsigned char *results, unsigned int bytes, unsigned int spi_channel);
-int setup_thermocouple(unsigned int *channel_asgn, unsigned char tc_type, unsigned char cj_assignment,  bool snl_ended, bool oc_chk, unsigned char oc_curr);
-int setup_diode(unsigned int *channel_asgn, bool snl_ended, bool three_readings, bool averaging, unsigned char exc_current, unsigned int ideality_f);
-int tx_buffer_stitch (unsigned char *tx_buffer, unsigned char *dat_buffer, int bytes);
-int gen_transaction(unsigned int *buff, unsigned char trans_type, unsigned short int address, unsigned char data);
-int write_all_channel_assignments(unsigned char *tx_buff, unsigned int *asgn_table, int spi_channel);
-int all_chnnel_conversion(int spi_channel);
-int read_channel_raw_value(int spi_channel, int channel_number, unsigned char *results);
-int ltc_2983_channel_err_decode(int spi_channel, int channel_number);
-float read_channel_double(int spi_channel, int channel_number);
-unsigned int or_mask_gen(unsigned int value, unsigned int bit_pos);
-
-// REGISTER DEFINITIONS
 // WRITE AND READ COMMANDS
 #define NOP         0x01
 #define WRITE       0x02
@@ -51,7 +35,7 @@ unsigned int or_mask_gen(unsigned int value, unsigned int bit_pos);
 #define CHANNEL_3   2
 #define CHANNEL_4   3
 #define CHANNEL_5   4
-#define CHANNEL_6   5
+#define CHANNEL_6   5 
 #define CHANNEL_7   6
 #define CHANNEL_8   7
 #define CHANNEL_9   8
@@ -97,7 +81,7 @@ unsigned int or_mask_gen(unsigned int value, unsigned int bit_pos);
 
 // TC Cold Junction Mapping *COMPLETE*
 // This is the cold junction channels represented in binary form
-// Cold Junction Pointers
+// Cold Junction Pointers  
 #define NO_CJ       0b00000
 #define CJ_CHNL_1   0b00001
 #define CJ_CHNL_2   0b00010
@@ -121,7 +105,7 @@ unsigned int or_mask_gen(unsigned int value, unsigned int bit_pos);
 #define CJ_CHNL_20  0b10100
 
 // TC Excitation Current ex. EXT, This is the excitation current provided by the LTC2983: Datasheet has more info
-// This is measured in microamps of excitation current [UA APPENDED]
+// This is measured in microamps of excitation current [UA APPENDED] 
 // EXT is the external excitation source will be used
 #define TC_EXT_C    0b00
 #define TC_10UA     0b00
@@ -153,4 +137,4 @@ unsigned int or_mask_gen(unsigned int value, unsigned int bit_pos);
 #define D_40UA      0b10
 #define D_80UA      0b11
 
-#endif
+#endif 
