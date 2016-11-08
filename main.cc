@@ -84,6 +84,7 @@ int main(int argc, char *argv[])
 int sock_server(unsigned int port)
 {
     // Vars needed for socket
+    const char* port_num = (char)port; 
     int sockfd, newsockfd, portno, n;
     socklen_t clilen;
     char buffer[256];
@@ -91,8 +92,12 @@ int sock_server(unsigned int port)
     struct sockaddr_in serv_addr, cli_addr;
     // Open a socket file descriptor
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if(sock_fd < 0)
+    if(sockfd < 0)
         error("ERROR opening socket");
+    // Zero out the struct 
+    bzero((char *) &serv_addr, sizeof(serv_addr));
+    portno = atoi(port);
+
     return 0;
 
 }
