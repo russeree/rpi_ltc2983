@@ -83,8 +83,7 @@ int main(int argc, char *argv[])
 
 int sock_server(unsigned int port)
 {
-    // Vars needed for socket
-    const char* port_num = (char)port; 
+    // Vars needed for socket 
     int sockfd, newsockfd, portno, n;
     socklen_t clilen;
     char buffer[256];
@@ -96,8 +95,12 @@ int sock_server(unsigned int port)
         error("ERROR opening socket");
     // Zero out the struct 
     bzero((char *) &serv_addr, sizeof(serv_addr));
-    portno = atoi(port);
-
+    // Assign portno the value of the port that passed as an arguement
+    portno = port;
+    // Setup the binding varibles
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(portno);
+    serv_addr.sin_addr.s_addr = INADDR_ANY;
     return 0;
 
 }
