@@ -101,8 +101,13 @@ int sock_server(unsigned int port)
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(portno);
     serv_addr.sin_addr.s_addr = INADDR_ANY;
-    return 0;
+    // Bind port
+    if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) , 0) 
+        error("ERROR on binding");
+    // Listen on socket for connections (5 maximum)
+    listen(sockfd, 5);
 
+    return 0;
 }
 
 void error(const char *msg)
