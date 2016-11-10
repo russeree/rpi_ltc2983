@@ -106,6 +106,14 @@ int sock_server(unsigned int port)
         error("ERROR on binding");
     // Listen on socket for connections (5 maximum)
     listen(sockfd, 5);
+    clilen = sizeof(cli_addr);
+    newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
+    if (newsockfd < 0)
+        error("ERROR on accept");
+    // write the packet to the socket.
+    n = write(newsockfd,"I got your message", 18);
+    if (n < 0)
+        error("Error writing to socket");
 
     return 0;
 }
