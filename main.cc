@@ -6,15 +6,11 @@
 #include <thread>
 
 // C LIBS
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <netinet/in.h> // Structs needed for internet and domain address.
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
-#include <time.h>
 
 // OBTAINED C LIBS
 #include <wiringPi.h>
@@ -22,12 +18,10 @@
 
 // CREATED C LIBS
 #include "ltc2983.h"
+#include "server.h"
 
 // #define DEBUG // Default Debug verbosity:
 // #define DEBUG_L1 // DEBUG Verbosity of level 1: Extended error messages: Byte level transation and buffer readouts
-
-int sock_server(unsigned int port);
-void error(const char *msg);
 
 int main(int argc, char *argv[])
 {
@@ -66,7 +60,7 @@ int main(int argc, char *argv[])
     // Perform a conversion
     all_chnnel_conversion(spi_chnl);
     get_command_status(spi_chnl);
-    for(int i = 0; i < 1800; i++)
+    for(int i = 0; i < 18; i++)
     {
         all_chnnel_conversion(spi_chnl);
         get_command_status(spi_chnl);
@@ -78,49 +72,6 @@ int main(int argc, char *argv[])
         results << temperature << '\n';
     }
     results.close();
+    sock_server(9777);
     return 0;
 }
-
-int sock_server(unsigned int port)
-{
-    // Vars needed for socket 
-    int sockfd, newsockfd, portno, n;
-    socklen_t clilen;
-    char buffer[256];
-    // Socket Connection info into buffer
-    struct sockaddr_in serv_addr, cli_addr;
-    // Open a socket file descriptor
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if(sockfd < 0)
-        error("ERROR opening socket");
-    // Zero out the struct 
-    bzero((char *) &serv_addr, sizeof(serv_addr));
-    // Assign portno the value of the port that passed as an arguement
-    portno = port;
-    // Setup the binding varibles
-    serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(portno);
-    serv_addr.sin_addr.s_addr = INADDR_ANY;
-    // Bind port
-    if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) , 0) 
-        error("ERROR on binding");
-    // Listen on socket for connections (5 maximum)
-    listen(sockfd, 5);
-    clilen = sizeof(cli_addr);
-    newsockfd = accept(sockfd, (struct sockaddr *) &cli_addr, &clilen);
-    if (newsockfd < 0)
-        error("ERROR on accept");
-    // write the packet to the socket.
-    n = write(newsockfd,"I got your message", 18);
-    if (n < 0)
-        error("Error writing to socket");
-
-    return 0;
-}
-
-void error(const char *msg)
-{
-    perror(msg);
-    exit(1);
-}
-
