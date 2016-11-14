@@ -1,20 +1,50 @@
 #ifndef LTC2983
 #define LTC2983
+// Class Wrapper for the LTC2983
+class ltc2983
+{
+// Functions
+public:
+    ltc2983();
+    virtual ~ltc2983();
+    int init_ltc2983 (int spi_channel);
+    int get_command_status(int spi_channel);
+    int read_data (unsigned short int address, unsigned char *results, unsigned int bytes, unsigned int spi_channel);
+    int setup_thermocouple(unsigned int *channel_asgn, unsigned char tc_type, unsigned char cj_assignment,  bool snl_ended, bool oc_chk, unsigned char oc_curr);
+    int setup_diode(unsigned int *channel_asgn, bool snl_ended, bool three_readings, bool averaging, unsigned char exc_current, unsigned int ideality_f);
+    int tx_buffer_stitch (unsigned char *tx_buffer, unsigned char *dat_buffer, int bytes);
+    int gen_transaction(unsigned int *buff, unsigned char trans_type, unsigned short int address, unsigned char data);
+    int write_all_channel_assignments(unsigned char *tx_buff, unsigned int *asgn_table, int spi_channel);
+    int all_chnnel_conversion(int spi_channel);
+    int read_channel_raw_value(int spi_channel, int channel_number, unsigned char *results);
+    int ltc_2983_channel_err_decode(int spi_channel, int channel_number);
+    float read_channel_double(int spi_channel, int channel_number);
+    unsigned int or_mask_gen(unsigned int value, unsigned int bit_pos);
+// Protected Varibles
+protected:
+    int status; //Contains the Status of the class object and can be checked for errors
+    const unsigned int d_ideality_f = 0x00101042; // Contains a single diode ideailtiy factor. Use this if all diodes have the same ideality. USE WITH THERMOCOUPLE HAT
+    unsigned int c_d_ideality_f [20]; // Contains an array ables to store multiple ideality factor valyes
+    int spi_channel; // SPI CHANNEL BEING USED 
+    unsigned int chnl_asgn_config[20]; // Stores the raw bits to be sent out for a channel assignment
+};
 
-// Functions for LTC2983
-int init_ltc2983 (int spi_channel);
-int get_command_status(int spi_channel);
-int read_data (unsigned short int address, unsigned char *results, unsigned int bytes, unsigned int spi_channel);
-int setup_thermocouple(unsigned int *channel_asgn, unsigned char tc_type, unsigned char cj_assignment,  bool snl_ended, bool oc_chk, unsigned char oc_curr);
-int setup_diode(unsigned int *channel_asgn, bool snl_ended, bool three_readings, bool averaging, unsigned char exc_current, unsigned int ideality_f);
-int tx_buffer_stitch (unsigned char *tx_buffer, unsigned char *dat_buffer, int bytes);
-int gen_transaction(unsigned int *buff, unsigned char trans_type, unsigned short int address, unsigned char data);
-int write_all_channel_assignments(unsigned char *tx_buff, unsigned int *asgn_table, int spi_channel);
-int all_chnnel_conversion(int spi_channel);
-int read_channel_raw_value(int spi_channel, int channel_number, unsigned char *results);
-int ltc_2983_channel_err_decode(int spi_channel, int channel_number);
-float read_channel_double(int spi_channel, int channel_number);
-unsigned int or_mask_gen(unsigned int value, unsigned int bit_pos);
+/**
+ * By: Reese Russell
+ * Description: Blow this point are a list of defines neccesay to configure the ltc2983
+ * These defines are incomplete as of 11/13/2016 but they are accurate and offer enough
+ * functionality to enable the LTC2983 to be configured for the rPI themocouple hat.
+ * FEATURES:
+ * - Channel Assigments
+ * - SPI commands
+ * - Thermocouple assigments
+ * - Diodes assigments
+ * - Thermocuple Varibles
+ * - Diode Varibles
+ * Notes:
+ * Please read the datasheet to understand how the configuration definitions
+ * as paramaters are used to configure the ltc2983
+ **/
 
 // REGISTER DEFINITIONS
 // WRITE AND READ COMMANDS
@@ -23,8 +53,8 @@ unsigned int or_mask_gen(unsigned int value, unsigned int bit_pos);
 #define READ        0x03
 
 // BASE ADDRESS MAP
-#define CNV_RSLTS   0x0010                 // START: 0x010 -> END: 0x05F [Word]
-#define CHNL_MAP    0x0200                 // START: 0x200 -> END: 0x24F [Word]
+#define CNV_RSLTS   0x0010 // START: 0x010 -> END: 0x05F [Word]
+#define CHNL_MAP    0x0200 // START: 0x200 -> END: 0x24F [Word]
 
 // TC SE/DIFF VALS
 #define SNGL        true

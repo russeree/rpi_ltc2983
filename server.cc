@@ -4,6 +4,7 @@
 #include <cmath>
 #include <fstream>
 #include <thread>
+#include <queue>
 
 // C LIBS
 #include <sys/socket.h>
@@ -50,12 +51,63 @@ int sock_server(unsigned int port)
         error("ERROR on accept");
     // Write the packet to the socket.
     n = write(newsockfd,"I got your message", 18);
+
     if (n < 0)
         error("Error writing to socket");
 
     return 0;
 }
 
+/**
+ * @Desc: Sockets Mux is a transactional layer that is design to contol transaction requests by type
+ * @Return: Returns the next state for the server to be in; 
+ * @Param: [input_buffer] Pointer to the input buffer from the endpoint tcp socket
+ * @Param: [output_buffer] Pointer to the output buffer going to the endpoint tcp socket 
+ * @Param: [ib_size] Size of the input buffer
+ * @Param: [ob_size] size of the output buffer
+ * @Param: [state] current state of the server
+ * @Note: Idealy this mux is meant to run as it's own thead controling the flow of data to and from the socket layer
+ **/
+int sokets_mux(char *input_buffer, char *output_buffer)
+{
+    // Convert the incoming message into a string
+    std::string rx_parse(input_buffer);
+    std::string state_string;
+    // Now Case the string into a function call for the LTC2983
+    if (rx_parse == "POLLING MODE")
+    {
+        state_string = "POLLING";
+        strcpy(output_buffer,state_string.c_str());
+        #ifdef SERV_DEBUG_1
+        std::cout << "Next TCP response = ";
+        for(int i = 0; i < 7; i++)
+            std::cout << output_buffer[i];
+        std::cout << "\n"; 
+        #endif
+        return 1;
+    }
+    if(rx_parse == "SPI_CHANNEL")
+    {
+        state_string = "SPI_CHANNEL";
+        strcpy(output_buffer, state_string.c_str());
+        return 2; 
+    }
+    // A Return Value of -1 Mean the mux did not perform any new operation. 
+    return -1; 
+}
+
+/**
+ * @desc: Communicates the channel configuration to Node Server.
+ * @param: output_buffer.  Tx output buffer
+ **/
+int serv_get_channel_config(void) 
+{
+    return 0;
+}
+
+/**
+ * @desc: Takes in a mesage and outputs a perror
+ **/
 void error(const char *msg)
 {
     perror(msg);
