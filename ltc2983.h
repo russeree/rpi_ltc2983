@@ -1,13 +1,15 @@
-#ifndef LTC2983
+ vifndef LTC2983
 #define LTC2983
-// Class Wrapper for the LTC2983
+/**
+ * @desc: A class wrapper for the LTC2983 IC the purpose for OOP is to integrate into the Sockets wapper and allow control
+ * over IC.
+ **/ 
 class ltc2983
 {
 // Functions
 public:
-    ltc2983();
+    ltc2983(int spi_channel);
     virtual ~ltc2983();
-    int init_ltc2983 (int spi_channel);
     int get_command_status(int spi_channel);
     int read_data (unsigned short int address, unsigned char *results, unsigned int bytes, unsigned int spi_channel);
     int setup_thermocouple(unsigned int *channel_asgn, unsigned char tc_type, unsigned char cj_assignment,  bool snl_ended, bool oc_chk, unsigned char oc_curr);
@@ -22,7 +24,7 @@ public:
     unsigned int or_mask_gen(unsigned int value, unsigned int bit_pos);
 // Protected Varibles
 protected:
-    int status; //Contains the Status of the class object and can be checked for errors
+    int status; // Contains the Status of the class object and can be checked for errors
     const unsigned int d_ideality_f = 0x00101042; // Contains a single diode ideailtiy factor. Use this if all diodes have the same ideality. USE WITH THERMOCOUPLE HAT
     unsigned int c_d_ideality_f [20]; // Contains an array ables to store multiple ideality factor valyes
     int spi_channel; // SPI CHANNEL BEING USED 

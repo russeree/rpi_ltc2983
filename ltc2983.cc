@@ -2,7 +2,7 @@
 #include <iostream>
 #include <bitset>
 #include <fstream>
-
+#include <exception>
 // C LIBS
 #include <string.h>
 #include <errno.h>
@@ -15,17 +15,29 @@
 // CREATED C LIBS
 #include "ltc2983.h"
 
-// This initializes the LTC2983
-int init_ltc2983 (int spi_channel)
+class ltc2983Exception : public exception
 {
-    int status;
+    int status; 
+public:
+    const char* what()
+    {
+        return "LTC2983 Initialization faliure\n";
+    }
+    void set_status(int status)
+        this -> status = status; 
+}
+
+ltc2983::ltc2983()
+{
+    
+    int status
     unsigned char spi_tx [4] = {}; // Spi Tansaction buffer, This gets pushed out to the IC and replace with BCM rx spi pin data
     unsigned int trans_buff;
     // Check to make sure the spi channel exists return 2;
     if ((spi_channel > 1) | (spi_channel < 0))
     {
         std::cout << "SPI channel is invalid, 0 and 1 are Supported\n";
-        return 2;
+        status = 2;
     }
     // Reset Device and set GPIO pin 26 high [This is the RST signal]
     pinMode(26, OUTPUT);
@@ -38,7 +50,7 @@ int init_ltc2983 (int spi_channel)
     if (wiringPiSPISetup (spi_channel, 100000) < 0)
     {
       fprintf (stderr, "SPI Setup failed: %s\n", strerror (errno));
-      return 1;
+      status = 1;
     }
     // Setup the device in Fahrenheit mode with 50/60HZ Rejection filters both enabled.
     gen_transaction(&trans_buff, WRITE, 0x00F0, 0b00000100);
@@ -46,7 +58,10 @@ int init_ltc2983 (int spi_channel)
         spi_tx[3-k] = (trans_buff >> (8*k)) & 0xff;
     // Write the Global Configuration register
     status = wiringPiSPIDataRW (spi_channel, &spi_tx[0], 4);
-    return 0;
+}
+
+ltc2983::~ltc2983()
+{
 }
 
 // Setup Thermocouple on a Channel :VERI:
