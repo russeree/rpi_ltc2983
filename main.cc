@@ -3,14 +3,17 @@
 #include <bitset>
 #include <cmath>
 #include <fstream>
-#include <thread>
 
 // C LIBS
+#include <sys/socket.h>
+#include <sys/types.h>
+#include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
+#include <time.h>
 
 // OBTAINED C LIBS
 #include <wiringPi.h>
@@ -18,7 +21,6 @@
 
 // CREATED C LIBS
 #include "ltc2983.h"
-#include "server.h"
 
 // #define DEBUG // Default Debug verbosity:
 // #define DEBUG_L1 // DEBUG Verbosity of level 1: Extended error messages: Byte level transation and buffer readouts
@@ -60,7 +62,7 @@ int main(int argc, char *argv[])
     // Perform a conversion
     all_chnnel_conversion(spi_chnl);
     get_command_status(spi_chnl);
-    for(int i = 0; i < 18; i++)
+    for(int i = 0; i < 1800; i++)
     {
         all_chnnel_conversion(spi_chnl);
         get_command_status(spi_chnl);
@@ -72,6 +74,5 @@ int main(int argc, char *argv[])
         results << temperature << '\n';
     }
     results.close();
-    sock_server(9777);
     return 0;
 }
