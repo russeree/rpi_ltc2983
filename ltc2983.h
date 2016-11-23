@@ -6,13 +6,13 @@ class ltc2983
 public:
   ltc2983(int spi_channel);
   virtual ~ltc2983();
+  int get_command_status(void);
 protected:
   int status;
+  int spi_channel;
 };
 
 // Functions for LTC2983
-int init_ltc2983 (int spi_channel);
-int get_command_status(int spi_channel);
 int read_data (unsigned short int address, unsigned char *results, unsigned int bytes, unsigned int spi_channel);
 int setup_thermocouple(unsigned int *channel_asgn, unsigned char tc_type, unsigned char cj_assignment,  bool snl_ended, bool oc_chk, unsigned char oc_curr);
 int setup_diode(unsigned int *channel_asgn, bool snl_ended, bool three_readings, bool averaging, unsigned char exc_current, unsigned int ideality_f);

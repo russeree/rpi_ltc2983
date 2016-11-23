@@ -42,8 +42,8 @@ int main(int argc, char *argv[])
     wiringPiSetupGpio();
     std::cout << "Raspi Thermocouple Hat Control Application\nEnter SPI channel of LTC2983 ";
     std::cin  >> spi_chnl;
+    ltc2983 ltc2983_0(spi_chnl);
     // Init the LTC2983 on input SPI channel
-    init_ltc2983(spi_chnl);
     // Sets up Thermocouples and Diodes as CJ
     setup_thermocouple(&chnl_asgn_map[CHANNEL_3],  TYPE_K, CJ_CHNL_1,  SNGL, OC_CHK_ON, TC_100UA);
     setup_thermocouple(&chnl_asgn_map[CHANNEL_7],  TYPE_K, CJ_CHNL_5,  SNGL, OC_CHK_ON, TC_100UA);
@@ -61,11 +61,9 @@ int main(int argc, char *argv[])
 
     // Perform a conversion
     all_chnnel_conversion(spi_chnl);
-    get_command_status(spi_chnl);
     for(int i = 0; i < 1800; i++)
     {
         all_chnnel_conversion(spi_chnl);
-        get_command_status(spi_chnl);
         temperature = read_channel_double(spi_chnl, 2);
         if(temperature == 9000)
             std::cout << "The temperature of channel " << 2 << " = ERROR" << "\n";

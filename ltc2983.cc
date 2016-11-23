@@ -23,9 +23,9 @@ ltc2983::ltc2983(int spi_channel)
   try
   {
     if ((spi_channel > 1) | (spi_channel < 0))
-    {
       throw 2;
-    }
+    else
+      this -> spi_channel = spi_channel;
   }
   catch(int err)
   {
@@ -41,9 +41,7 @@ ltc2983::ltc2983(int spi_channel)
   // Setup SPI based on the SS channel R[12,13] is jumped to. [Will print errors]
   try{
     if (wiringPiSPISetup (spi_channel, 100000) < 0)
-    {
       throw 1;
-    }
   }
   catch(int err)
   {
@@ -54,7 +52,7 @@ ltc2983::ltc2983(int spi_channel)
   for(int k = 0; k < 4; k++)
       spi_tx[3-k] = (trans_buff >> (8*k)) & 0xff;
   // Write the Global Configuration register
-  status = wiringPiSPIDataRW (spi_channel, &spi_tx[0], 4);
+  this -> status = wiringPiSPIDataRW (spi_channel, &spi_tx[0], 4);
 }
 
 /**
@@ -62,38 +60,45 @@ ltc2983::ltc2983(int spi_channel)
  **/
 ltc2983::~ltc2983(){}
 
-// This initializes the LTC2983
-int init_ltc2983 (int spi_channel)
+/**
+ * @desc: Read the Command Regiser and prints a Readable message if DEBUG is defined.
+ **/
+int ltc2983::get_command_status(void)
 {
     int status;
-    unsigned char spi_tx [4] = {}; // Spi Tansaction buffer, This gets pushed out to the IC and replace with BCM rx spi pin data
-    unsigned int trans_buff;
-    // Check to make sure the spi channel exists return 2;
-    if ((spi_channel > 1) | (spi_channel < 0))
+    unsigned char status_reg;
+    read_data(0x0000, &status_reg, 1, this -> spi_channel);
+    #ifdef DEBUG
+    std::cout << "Command register read and ";
+    #endif
+    switch(status_reg)
     {
-        std::cout << "SPI channel is invalid, 0 and 1 are Supported\n";
-        return 2;
+        case 0x80:
+        {
+            #ifdef DEBUG
+            std::cout << "LTC2983 is initialized with no channel configuration.\n";
+            #endif
+            status = 2;
+            break;
+        }
+        case 0x40:
+        {
+            #ifdef DEBUG
+            std::cout << "LTC2983 is ready for use\n";
+            #endif
+            status = 1;
+            break;
+        }
+        default:
+        {
+            #ifdef DEBUG
+            std::cout << "result " << std::bitset<8>(status_reg) << " was not defined as a valid response.\n";
+            #endif
+            status = 3;
+            break;
+        }
     }
-    // Reset Device and set GPIO pin 26 high [This is the RST signal]
-    pinMode(26, OUTPUT);
-    digitalWrite(26, LOW);
-    delay(100);
-    pinMode(26, OUTPUT);
-    digitalWrite(26, HIGH);
-    delay(300);
-    // Setup SPI based on the SS channel R[12,13] is jumped to. [Will print errors]
-    if (wiringPiSPISetup (spi_channel, 100000) < 0)
-    {
-      fprintf (stderr, "SPI Setup failed: %s\n", strerror (errno));
-      return 1;
-    }
-    // Setup the device in Fahrenheit mode with 50/60HZ Rejection filters both enabled.
-    gen_transaction(&trans_buff, WRITE, 0x00F0, 0b00000100);
-    for(int k = 0; k < 4; k++)
-        spi_tx[3-k] = (trans_buff >> (8*k)) & 0xff;
-    // Write the Global Configuration register
-    status = wiringPiSPIDataRW (spi_channel, &spi_tx[0], 4);
-    return 0;
+    return status;
 }
 
 // Setup Thermocouple on a Channel :VERI:
@@ -271,48 +276,6 @@ int read_data (unsigned short int address, unsigned char *results, unsigned int 
         results[i] = tx[3];
     }
     return 0;
-}
-
-/**
- * @desc: Read the Command Regiser and prints a Readable message if DEBUG is defined.
- * @param: [spi_channel] the spi channel that commands will be written to.
- **/
-int get_command_status(int spi_channel)
-{
-    int status;
-    unsigned char status_reg;
-    read_data(0x0000, &status_reg, 1, spi_channel);
-    #ifdef DEBUG
-    std::cout << "Command register read and ";
-    #endif
-    switch(status_reg)
-    {
-        case 0x80:
-        {
-            #ifdef DEBUG
-            std::cout << "LTC2983 is initialized with no channel configuration.\n";
-            #endif
-            status = 2;
-            break;
-        }
-        case 0x40:
-        {
-            #ifdef DEBUG
-            std::cout << "LTC2983 is ready for use\n";
-            #endif
-            status = 1;
-            break;
-        }
-        default:
-        {
-            #ifdef DEBUG
-            std::cout << "result " << std::bitset<8>(status_reg) << " was not defined as a valid response.\n";
-            #endif
-            status = 3;
-            break;
-        }
-    }
-    return status;
 }
 
 /**
