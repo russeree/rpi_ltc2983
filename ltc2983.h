@@ -1,6 +1,15 @@
 #ifndef LTC2983
 #define LTC2983
 
+class ltc2983
+{
+public:
+  ltc2983(int spi_channel);
+  virtual ~ltc2983();
+protected:
+  int status;
+};
+
 // Functions for LTC2983
 int init_ltc2983 (int spi_channel);
 int get_command_status(int spi_channel);

@@ -2,18 +2,65 @@
 #include <iostream>
 #include <bitset>
 #include <fstream>
-
 // C LIBS
 #include <string.h>
 #include <errno.h>
 #include <stdio.h>
-
 // OBTAINED C LIBS
 #include <wiringPi.h>
 #include <wiringPiSPI.h>
-
 // CREATED C LIBS
 #include "ltc2983.h"
+/**
+ * @desc: initializes the ltc2983
+ * @param: [spi_channel] the spi_channel that will be used
+ **/
+ltc2983::ltc2983(int spi_channel)
+{
+  unsigned char spi_tx [4] = {}; // Spi Tansaction buffer, This gets pushed out to the IC and replace with BCM rx spi pin data
+  unsigned int trans_buff;
+  // Check to make sure the spi channel exists return 2;
+  try
+  {
+    if ((spi_channel > 1) | (spi_channel < 0))
+    {
+      throw 2;
+    }
+  }
+  catch(int err)
+  {
+    std::cout << "SPI channel is invalid, 0 and 1 are Supported\n";
+  }
+  // Reset Device and set GPIO pin 26 high [This is the RST signal]
+  pinMode(26, OUTPUT);
+  digitalWrite(26, LOW);
+  delay(100);
+  pinMode(26, OUTPUT);
+  digitalWrite(26, HIGH);
+  delay(300);
+  // Setup SPI based on the SS channel R[12,13] is jumped to. [Will print errors]
+  try{
+    if (wiringPiSPISetup (spi_channel, 100000) < 0)
+    {
+      throw 1;
+    }
+  }
+  catch(int err)
+  {
+    fprintf (stderr, "SPI Setup failed: %s\n", strerror (errno));
+  }
+  // Setup the device in Fahrenheit mode with 50/60HZ Rejection filters both enabled.
+  gen_transaction(&trans_buff, WRITE, 0x00F0, 0b00000100);
+  for(int k = 0; k < 4; k++)
+      spi_tx[3-k] = (trans_buff >> (8*k)) & 0xff;
+  // Write the Global Configuration register
+  status = wiringPiSPIDataRW (spi_channel, &spi_tx[0], 4);
+}
+
+/**
+ * @desc: LTC2983 destructor
+ **/
+ltc2983::~ltc2983(){}
 
 // This initializes the LTC2983
 int init_ltc2983 (int spi_channel)
