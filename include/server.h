@@ -1,15 +1,15 @@
 #ifndef SERVER
 #define SERVER
 
-// Type Definition Structures
-struct ltc2983_packet
+#include <boost/bind.hpp>
+#include <boost/asio.hpp>
+
+using boost::asio::ip::tcp;
+
+extern boost::asio::io_service ioservice; 
+
+class session
 {
-    unsigned int bytes;
-    unsigned char *data;
+public:
 };
-
-// Functions
-void error(const char *msg);
-int sock_server(unsigned int port);
-
 #endif
