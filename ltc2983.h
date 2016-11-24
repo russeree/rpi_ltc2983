@@ -7,23 +7,22 @@ public:
   ltc2983(int spi_channel);
   virtual ~ltc2983();
   int get_command_status(void);
+  int read_data(unsigned short int address, unsigned char *results, unsigned int bytes);
+  int setup_thermocouple(unsigned int channel, unsigned char tc_type, unsigned char cj_assignment,  bool snl_ended, bool oc_chk, unsigned char oc_curr);
+  int setup_diode(unsigned int channel, bool snl_ended, bool three_readings, bool averaging, unsigned char exc_current, unsigned int ideality_f);
+  int write_all_channel_assignments(unsigned char *tx_buff);
+  int all_chnnel_conversion(void);
+  int channel_err_decode(int channel_number);
+  float read_channel_double(int channel_number);
 protected:
   int status;
   int spi_channel;
+  unsigned int chnl_asgn_map [20] = {};
 };
 
-// Functions for LTC2983
-int read_data (unsigned short int address, unsigned char *results, unsigned int bytes, unsigned int spi_channel);
-int setup_thermocouple(unsigned int *channel_asgn, unsigned char tc_type, unsigned char cj_assignment,  bool snl_ended, bool oc_chk, unsigned char oc_curr);
-int setup_diode(unsigned int *channel_asgn, bool snl_ended, bool three_readings, bool averaging, unsigned char exc_current, unsigned int ideality_f);
-int tx_buffer_stitch (unsigned char *tx_buffer, unsigned char *dat_buffer, int bytes);
-int gen_transaction(unsigned int *buff, unsigned char trans_type, unsigned short int address, unsigned char data);
-int write_all_channel_assignments(unsigned char *tx_buff, unsigned int *asgn_table, int spi_channel);
-int all_chnnel_conversion(int spi_channel);
-int read_channel_raw_value(int spi_channel, int channel_number, unsigned char *results);
-int ltc_2983_channel_err_decode(int spi_channel, int channel_number);
-float read_channel_double(int spi_channel, int channel_number);
-unsigned int or_mask_gen(unsigned int value, unsigned int bit_pos);
+// External Functions
+extern int gen_transaction(unsigned int *buff, unsigned char trans_type, unsigned short int address, unsigned char data);
+extern unsigned int or_mask_gen(unsigned int value, unsigned int bit_pos);
 
 // REGISTER DEFINITIONS
 // WRITE AND READ COMMANDS
@@ -55,26 +54,26 @@ unsigned int or_mask_gen(unsigned int value, unsigned int bit_pos);
 #define TYPE_DIODE  0b11100
 
 // Channel Number to Array Bindings
-#define CHANNEL_1   0
-#define CHANNEL_2   1
-#define CHANNEL_3   2
-#define CHANNEL_4   3
-#define CHANNEL_5   4
-#define CHANNEL_6   5
-#define CHANNEL_7   6
-#define CHANNEL_8   7
-#define CHANNEL_9   8
-#define CHANNEL_10  9
-#define CHANNEL_11  10
-#define CHANNEL_12  11
-#define CHANNEL_13  12
-#define CHANNEL_14  13
-#define CHANNEL_15  14
-#define CHANNEL_16  15
-#define CHANNEL_17  16
-#define CHANNEL_18  17
-#define CHANNEL_19  18
-#define CHANNEL_20  19
+#define CHANNEL_1   1
+#define CHANNEL_2   2
+#define CHANNEL_3   3
+#define CHANNEL_4   4
+#define CHANNEL_5   5
+#define CHANNEL_6   6
+#define CHANNEL_7   7
+#define CHANNEL_8   8
+#define CHANNEL_9   9
+#define CHANNEL_10  10
+#define CHANNEL_11  11
+#define CHANNEL_12  12
+#define CHANNEL_13  13
+#define CHANNEL_14  14
+#define CHANNEL_15  15
+#define CHANNEL_16  16
+#define CHANNEL_17  17
+#define CHANNEL_18  18
+#define CHANNEL_19  19
+#define CHANNEL_20  20
 
 // Input Channel Mapping *COMPLETE*
 // This is the input channels represented in binary form
