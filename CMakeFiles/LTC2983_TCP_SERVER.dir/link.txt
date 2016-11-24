@@ -1,0 +1,1 @@
+/usr/bin/c++      CMakeFiles/LTC2983_TCP_SERVER.dir/src/main.cc.o CMakeFiles/LTC2983_TCP_SERVER.dir/src/server.cc.o CMakeFiles/LTC2983_TCP_SERVER.dir/src/ltc2983.cc.o  -o LTC2983_TCP_SERVER -rdynamic /usr/local/lib/libwiringPi.so -lpthread -Wl,-rpath,/usr/local/lib 
