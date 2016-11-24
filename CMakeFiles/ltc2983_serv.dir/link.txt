@@ -1,1 +1,0 @@
-/usr/bin/c++      CMakeFiles/ltc2983_serv.dir/main.cc.o  -o ltc2983_serv -rdynamic 
