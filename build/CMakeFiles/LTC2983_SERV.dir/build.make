@@ -57,9 +57,33 @@ include CMakeFiles/LTC2983_SERV.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/LTC2983_SERV.dir/flags.make
 
+CMakeFiles/LTC2983_SERV.dir/src/tcp_connection.cc.o: CMakeFiles/LTC2983_SERV.dir/flags.make
+CMakeFiles/LTC2983_SERV.dir/src/tcp_connection.cc.o: ../src/tcp_connection.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/rpi_ltc2983/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/LTC2983_SERV.dir/src/tcp_connection.cc.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/LTC2983_SERV.dir/src/tcp_connection.cc.o -c /home/pi/rpi_ltc2983/src/tcp_connection.cc
+
+CMakeFiles/LTC2983_SERV.dir/src/tcp_connection.cc.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/LTC2983_SERV.dir/src/tcp_connection.cc.i"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/pi/rpi_ltc2983/src/tcp_connection.cc > CMakeFiles/LTC2983_SERV.dir/src/tcp_connection.cc.i
+
+CMakeFiles/LTC2983_SERV.dir/src/tcp_connection.cc.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/LTC2983_SERV.dir/src/tcp_connection.cc.s"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/pi/rpi_ltc2983/src/tcp_connection.cc -o CMakeFiles/LTC2983_SERV.dir/src/tcp_connection.cc.s
+
+CMakeFiles/LTC2983_SERV.dir/src/tcp_connection.cc.o.requires:
+
+.PHONY : CMakeFiles/LTC2983_SERV.dir/src/tcp_connection.cc.o.requires
+
+CMakeFiles/LTC2983_SERV.dir/src/tcp_connection.cc.o.provides: CMakeFiles/LTC2983_SERV.dir/src/tcp_connection.cc.o.requires
+	$(MAKE) -f CMakeFiles/LTC2983_SERV.dir/build.make CMakeFiles/LTC2983_SERV.dir/src/tcp_connection.cc.o.provides.build
+.PHONY : CMakeFiles/LTC2983_SERV.dir/src/tcp_connection.cc.o.provides
+
+CMakeFiles/LTC2983_SERV.dir/src/tcp_connection.cc.o.provides.build: CMakeFiles/LTC2983_SERV.dir/src/tcp_connection.cc.o
+
+
 CMakeFiles/LTC2983_SERV.dir/src/main.cc.o: CMakeFiles/LTC2983_SERV.dir/flags.make
 CMakeFiles/LTC2983_SERV.dir/src/main.cc.o: ../src/main.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/rpi_ltc2983/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/LTC2983_SERV.dir/src/main.cc.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/rpi_ltc2983/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/LTC2983_SERV.dir/src/main.cc.o"
 	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/LTC2983_SERV.dir/src/main.cc.o -c /home/pi/rpi_ltc2983/src/main.cc
 
 CMakeFiles/LTC2983_SERV.dir/src/main.cc.i: cmake_force
@@ -81,33 +105,33 @@ CMakeFiles/LTC2983_SERV.dir/src/main.cc.o.provides: CMakeFiles/LTC2983_SERV.dir/
 CMakeFiles/LTC2983_SERV.dir/src/main.cc.o.provides.build: CMakeFiles/LTC2983_SERV.dir/src/main.cc.o
 
 
-CMakeFiles/LTC2983_SERV.dir/src/server.cc.o: CMakeFiles/LTC2983_SERV.dir/flags.make
-CMakeFiles/LTC2983_SERV.dir/src/server.cc.o: ../src/server.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/rpi_ltc2983/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/LTC2983_SERV.dir/src/server.cc.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/LTC2983_SERV.dir/src/server.cc.o -c /home/pi/rpi_ltc2983/src/server.cc
+CMakeFiles/LTC2983_SERV.dir/src/tcp_server.cc.o: CMakeFiles/LTC2983_SERV.dir/flags.make
+CMakeFiles/LTC2983_SERV.dir/src/tcp_server.cc.o: ../src/tcp_server.cc
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/rpi_ltc2983/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/LTC2983_SERV.dir/src/tcp_server.cc.o"
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/LTC2983_SERV.dir/src/tcp_server.cc.o -c /home/pi/rpi_ltc2983/src/tcp_server.cc
 
-CMakeFiles/LTC2983_SERV.dir/src/server.cc.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/LTC2983_SERV.dir/src/server.cc.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/pi/rpi_ltc2983/src/server.cc > CMakeFiles/LTC2983_SERV.dir/src/server.cc.i
+CMakeFiles/LTC2983_SERV.dir/src/tcp_server.cc.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/LTC2983_SERV.dir/src/tcp_server.cc.i"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/pi/rpi_ltc2983/src/tcp_server.cc > CMakeFiles/LTC2983_SERV.dir/src/tcp_server.cc.i
 
-CMakeFiles/LTC2983_SERV.dir/src/server.cc.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/LTC2983_SERV.dir/src/server.cc.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/pi/rpi_ltc2983/src/server.cc -o CMakeFiles/LTC2983_SERV.dir/src/server.cc.s
+CMakeFiles/LTC2983_SERV.dir/src/tcp_server.cc.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/LTC2983_SERV.dir/src/tcp_server.cc.s"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/pi/rpi_ltc2983/src/tcp_server.cc -o CMakeFiles/LTC2983_SERV.dir/src/tcp_server.cc.s
 
-CMakeFiles/LTC2983_SERV.dir/src/server.cc.o.requires:
+CMakeFiles/LTC2983_SERV.dir/src/tcp_server.cc.o.requires:
 
-.PHONY : CMakeFiles/LTC2983_SERV.dir/src/server.cc.o.requires
+.PHONY : CMakeFiles/LTC2983_SERV.dir/src/tcp_server.cc.o.requires
 
-CMakeFiles/LTC2983_SERV.dir/src/server.cc.o.provides: CMakeFiles/LTC2983_SERV.dir/src/server.cc.o.requires
-	$(MAKE) -f CMakeFiles/LTC2983_SERV.dir/build.make CMakeFiles/LTC2983_SERV.dir/src/server.cc.o.provides.build
-.PHONY : CMakeFiles/LTC2983_SERV.dir/src/server.cc.o.provides
+CMakeFiles/LTC2983_SERV.dir/src/tcp_server.cc.o.provides: CMakeFiles/LTC2983_SERV.dir/src/tcp_server.cc.o.requires
+	$(MAKE) -f CMakeFiles/LTC2983_SERV.dir/build.make CMakeFiles/LTC2983_SERV.dir/src/tcp_server.cc.o.provides.build
+.PHONY : CMakeFiles/LTC2983_SERV.dir/src/tcp_server.cc.o.provides
 
-CMakeFiles/LTC2983_SERV.dir/src/server.cc.o.provides.build: CMakeFiles/LTC2983_SERV.dir/src/server.cc.o
+CMakeFiles/LTC2983_SERV.dir/src/tcp_server.cc.o.provides.build: CMakeFiles/LTC2983_SERV.dir/src/tcp_server.cc.o
 
 
 CMakeFiles/LTC2983_SERV.dir/src/ltc2983.cc.o: CMakeFiles/LTC2983_SERV.dir/flags.make
 CMakeFiles/LTC2983_SERV.dir/src/ltc2983.cc.o: ../src/ltc2983.cc
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/rpi_ltc2983/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/LTC2983_SERV.dir/src/ltc2983.cc.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/pi/rpi_ltc2983/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/LTC2983_SERV.dir/src/ltc2983.cc.o"
 	/usr/bin/c++   $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/LTC2983_SERV.dir/src/ltc2983.cc.o -c /home/pi/rpi_ltc2983/src/ltc2983.cc
 
 CMakeFiles/LTC2983_SERV.dir/src/ltc2983.cc.i: cmake_force
@@ -131,21 +155,24 @@ CMakeFiles/LTC2983_SERV.dir/src/ltc2983.cc.o.provides.build: CMakeFiles/LTC2983_
 
 # Object files for target LTC2983_SERV
 LTC2983_SERV_OBJECTS = \
+"CMakeFiles/LTC2983_SERV.dir/src/tcp_connection.cc.o" \
 "CMakeFiles/LTC2983_SERV.dir/src/main.cc.o" \
-"CMakeFiles/LTC2983_SERV.dir/src/server.cc.o" \
+"CMakeFiles/LTC2983_SERV.dir/src/tcp_server.cc.o" \
 "CMakeFiles/LTC2983_SERV.dir/src/ltc2983.cc.o"
 
 # External object files for target LTC2983_SERV
 LTC2983_SERV_EXTERNAL_OBJECTS =
 
+LTC2983_SERV: CMakeFiles/LTC2983_SERV.dir/src/tcp_connection.cc.o
 LTC2983_SERV: CMakeFiles/LTC2983_SERV.dir/src/main.cc.o
-LTC2983_SERV: CMakeFiles/LTC2983_SERV.dir/src/server.cc.o
+LTC2983_SERV: CMakeFiles/LTC2983_SERV.dir/src/tcp_server.cc.o
 LTC2983_SERV: CMakeFiles/LTC2983_SERV.dir/src/ltc2983.cc.o
 LTC2983_SERV: CMakeFiles/LTC2983_SERV.dir/build.make
 LTC2983_SERV: /usr/local/lib/libwiringPi.so
 LTC2983_SERV: /usr/local/lib/libboost_system.so
+LTC2983_SERV: /usr/local/lib/libboost_thread.so
 LTC2983_SERV: CMakeFiles/LTC2983_SERV.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/pi/rpi_ltc2983/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable LTC2983_SERV"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/pi/rpi_ltc2983/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable LTC2983_SERV"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/LTC2983_SERV.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -153,8 +180,9 @@ CMakeFiles/LTC2983_SERV.dir/build: LTC2983_SERV
 
 .PHONY : CMakeFiles/LTC2983_SERV.dir/build
 
+CMakeFiles/LTC2983_SERV.dir/requires: CMakeFiles/LTC2983_SERV.dir/src/tcp_connection.cc.o.requires
 CMakeFiles/LTC2983_SERV.dir/requires: CMakeFiles/LTC2983_SERV.dir/src/main.cc.o.requires
-CMakeFiles/LTC2983_SERV.dir/requires: CMakeFiles/LTC2983_SERV.dir/src/server.cc.o.requires
+CMakeFiles/LTC2983_SERV.dir/requires: CMakeFiles/LTC2983_SERV.dir/src/tcp_server.cc.o.requires
 CMakeFiles/LTC2983_SERV.dir/requires: CMakeFiles/LTC2983_SERV.dir/src/ltc2983.cc.o.requires
 
 .PHONY : CMakeFiles/LTC2983_SERV.dir/requires

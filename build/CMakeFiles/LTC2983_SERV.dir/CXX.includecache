@@ -6,9 +6,21 @@
 
 #IncludeRegexTransform: 
 
-../include/ltc2983.h
+../include/tcp_connection.hpp
+boost/bind.hpp
+-
+boost/shared_ptr.hpp
+-
+boost/enable_shared_from_this.hpp
+-
+boost/asio.hpp
+-
 
-../include/server.h
+../include/tcp_server.hpp
+boost/shared_ptr.hpp
+-
+boost/enable_shared_from_this.hpp
+-
 boost/bind.hpp
 -
 boost/asio.hpp
@@ -68,13 +80,17 @@ wiringPiSPI.h
 ltc2983.h
 /home/pi/rpi_ltc2983/src/ltc2983.h
 
-/home/pi/rpi_ltc2983/src/server.cc
+/home/pi/rpi_ltc2983/src/tcp_connection.cc
+tcp_connection.hpp
+-
+
+/home/pi/rpi_ltc2983/src/tcp_server.cc
 iostream
 -
 cstdlib
 -
-server.h
-/home/pi/rpi_ltc2983/src/server.h
+tcp_server.hpp
+-
 
 /usr/local/include/boost/array.hpp
 boost/detail/workaround.hpp
@@ -7518,6 +7534,10 @@ boost/detail/winapi/basic_types.hpp
 boost/config.hpp
 -
 
+/usr/local/include/boost/enable_shared_from_this.hpp
+boost/smart_ptr/enable_shared_from_this.hpp
+-
+
 /usr/local/include/boost/exception/exception.hpp
 
 /usr/local/include/boost/function.hpp
@@ -11680,6 +11700,16 @@ _mingw.h
 sched.h
 -
 time.h
+-
+
+/usr/local/include/boost/smart_ptr/enable_shared_from_this.hpp
+boost/smart_ptr/weak_ptr.hpp
+-
+boost/smart_ptr/shared_ptr.hpp
+-
+boost/assert.hpp
+-
+boost/config.hpp
 -
 
 /usr/local/include/boost/smart_ptr/scoped_array.hpp

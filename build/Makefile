@@ -177,32 +177,59 @@ src/main.cc.s:
 	$(MAKE) -f CMakeFiles/LTC2983_SERV.dir/build.make CMakeFiles/LTC2983_SERV.dir/src/main.cc.s
 .PHONY : src/main.cc.s
 
-src/server.o: src/server.cc.o
+src/tcp_connection.o: src/tcp_connection.cc.o
 
-.PHONY : src/server.o
+.PHONY : src/tcp_connection.o
 
 # target to build an object file
-src/server.cc.o:
-	$(MAKE) -f CMakeFiles/LTC2983_SERV.dir/build.make CMakeFiles/LTC2983_SERV.dir/src/server.cc.o
-.PHONY : src/server.cc.o
+src/tcp_connection.cc.o:
+	$(MAKE) -f CMakeFiles/LTC2983_SERV.dir/build.make CMakeFiles/LTC2983_SERV.dir/src/tcp_connection.cc.o
+.PHONY : src/tcp_connection.cc.o
 
-src/server.i: src/server.cc.i
+src/tcp_connection.i: src/tcp_connection.cc.i
 
-.PHONY : src/server.i
+.PHONY : src/tcp_connection.i
 
 # target to preprocess a source file
-src/server.cc.i:
-	$(MAKE) -f CMakeFiles/LTC2983_SERV.dir/build.make CMakeFiles/LTC2983_SERV.dir/src/server.cc.i
-.PHONY : src/server.cc.i
+src/tcp_connection.cc.i:
+	$(MAKE) -f CMakeFiles/LTC2983_SERV.dir/build.make CMakeFiles/LTC2983_SERV.dir/src/tcp_connection.cc.i
+.PHONY : src/tcp_connection.cc.i
 
-src/server.s: src/server.cc.s
+src/tcp_connection.s: src/tcp_connection.cc.s
 
-.PHONY : src/server.s
+.PHONY : src/tcp_connection.s
 
 # target to generate assembly for a file
-src/server.cc.s:
-	$(MAKE) -f CMakeFiles/LTC2983_SERV.dir/build.make CMakeFiles/LTC2983_SERV.dir/src/server.cc.s
-.PHONY : src/server.cc.s
+src/tcp_connection.cc.s:
+	$(MAKE) -f CMakeFiles/LTC2983_SERV.dir/build.make CMakeFiles/LTC2983_SERV.dir/src/tcp_connection.cc.s
+.PHONY : src/tcp_connection.cc.s
+
+src/tcp_server.o: src/tcp_server.cc.o
+
+.PHONY : src/tcp_server.o
+
+# target to build an object file
+src/tcp_server.cc.o:
+	$(MAKE) -f CMakeFiles/LTC2983_SERV.dir/build.make CMakeFiles/LTC2983_SERV.dir/src/tcp_server.cc.o
+.PHONY : src/tcp_server.cc.o
+
+src/tcp_server.i: src/tcp_server.cc.i
+
+.PHONY : src/tcp_server.i
+
+# target to preprocess a source file
+src/tcp_server.cc.i:
+	$(MAKE) -f CMakeFiles/LTC2983_SERV.dir/build.make CMakeFiles/LTC2983_SERV.dir/src/tcp_server.cc.i
+.PHONY : src/tcp_server.cc.i
+
+src/tcp_server.s: src/tcp_server.cc.s
+
+.PHONY : src/tcp_server.s
+
+# target to generate assembly for a file
+src/tcp_server.cc.s:
+	$(MAKE) -f CMakeFiles/LTC2983_SERV.dir/build.make CMakeFiles/LTC2983_SERV.dir/src/tcp_server.cc.s
+.PHONY : src/tcp_server.cc.s
 
 # Help Target
 help:
@@ -219,9 +246,12 @@ help:
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
-	@echo "... src/server.o"
-	@echo "... src/server.i"
-	@echo "... src/server.s"
+	@echo "... src/tcp_connection.o"
+	@echo "... src/tcp_connection.i"
+	@echo "... src/tcp_connection.s"
+	@echo "... src/tcp_server.o"
+	@echo "... src/tcp_server.i"
+	@echo "... src/tcp_server.s"
 .PHONY : help
 
 

@@ -7,7 +7,7 @@
 // This will include all the boost libs needed for this class
 #include <tcp_connection.hpp>
 
-static pointer tcp_connection::create(boost::asio::io_service& io_service)
+tcp_connection::pointer tcp_connection::create(boost::asio::io_service& io_service)
 {
     return pointer(new tcp_connection(io_service));
 }

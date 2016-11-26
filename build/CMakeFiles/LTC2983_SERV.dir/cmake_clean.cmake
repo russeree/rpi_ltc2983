@@ -1,6 +1,7 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/LTC2983_SERV.dir/src/tcp_connection.cc.o"
   "CMakeFiles/LTC2983_SERV.dir/src/main.cc.o"
-  "CMakeFiles/LTC2983_SERV.dir/src/server.cc.o"
+  "CMakeFiles/LTC2983_SERV.dir/src/tcp_server.cc.o"
   "CMakeFiles/LTC2983_SERV.dir/src/ltc2983.cc.o"
   "LTC2983_SERV.pdb"
   "LTC2983_SERV"

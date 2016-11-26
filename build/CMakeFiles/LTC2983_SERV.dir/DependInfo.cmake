@@ -6,7 +6,8 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_CHECK_CXX
   "/home/pi/rpi_ltc2983/src/ltc2983.cc" "/home/pi/rpi_ltc2983/build/CMakeFiles/LTC2983_SERV.dir/src/ltc2983.cc.o"
   "/home/pi/rpi_ltc2983/src/main.cc" "/home/pi/rpi_ltc2983/build/CMakeFiles/LTC2983_SERV.dir/src/main.cc.o"
-  "/home/pi/rpi_ltc2983/src/server.cc" "/home/pi/rpi_ltc2983/build/CMakeFiles/LTC2983_SERV.dir/src/server.cc.o"
+  "/home/pi/rpi_ltc2983/src/tcp_connection.cc" "/home/pi/rpi_ltc2983/build/CMakeFiles/LTC2983_SERV.dir/src/tcp_connection.cc.o"
+  "/home/pi/rpi_ltc2983/src/tcp_server.cc" "/home/pi/rpi_ltc2983/build/CMakeFiles/LTC2983_SERV.dir/src/tcp_server.cc.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
