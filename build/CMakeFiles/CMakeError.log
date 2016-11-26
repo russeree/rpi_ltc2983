@@ -1,0 +1,110 @@
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/pi/rpi_ltc2983/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_33eb8/fast"
+/usr/bin/make -f CMakeFiles/cmTC_33eb8.dir/build.make CMakeFiles/cmTC_33eb8.dir/build
+make[1]: Entering directory '/home/pi/rpi_ltc2983/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_33eb8.dir/CheckSymbolExists.c.o
+/usr/bin/cc     -o CMakeFiles/cmTC_33eb8.dir/CheckSymbolExists.c.o   -c /home/pi/rpi_ltc2983/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_33eb8
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_33eb8.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTC_33eb8.dir/CheckSymbolExists.c.o  -o cmTC_33eb8 -rdynamic 
+CMakeFiles/cmTC_33eb8.dir/CheckSymbolExists.c.o: In function `main':
+CheckSymbolExists.c:(.text+0x38): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_33eb8.dir/build.make:97: recipe for target 'cmTC_33eb8' failed
+make[1]: Leaving directory '/home/pi/rpi_ltc2983/build/CMakeFiles/CMakeTmp'
+make[1]: *** [cmTC_33eb8] Error 1
+Makefile:126: recipe for target 'cmTC_33eb8/fast' failed
+make: *** [cmTC_33eb8/fast] Error 2
+
+File /home/pi/rpi_ltc2983/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/pi/rpi_ltc2983/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_40373/fast"
+/usr/bin/make -f CMakeFiles/cmTC_40373.dir/build.make CMakeFiles/cmTC_40373.dir/build
+make[1]: Entering directory '/home/pi/rpi_ltc2983/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_40373.dir/CheckFunctionExists.c.o
+/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_40373.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.4/Modules/CheckFunctionExists.c
+Linking C executable cmTC_40373
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_40373.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_40373.dir/CheckFunctionExists.c.o  -o cmTC_40373 -rdynamic -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_40373.dir/build.make:97: recipe for target 'cmTC_40373' failed
+make[1]: Leaving directory '/home/pi/rpi_ltc2983/build/CMakeFiles/CMakeTmp'
+make[1]: *** [cmTC_40373] Error 1
+Makefile:126: recipe for target 'cmTC_40373/fast' failed
+make: *** [cmTC_40373/fast] Error 2
+
+
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/pi/rpi_ltc2983/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_1a724/fast"
+/usr/bin/make -f CMakeFiles/cmTC_1a724.dir/build.make CMakeFiles/cmTC_1a724.dir/build
+make[1]: Entering directory '/home/pi/rpi_ltc2983/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_1a724.dir/CheckSymbolExists.c.o
+/usr/bin/cc     -o CMakeFiles/cmTC_1a724.dir/CheckSymbolExists.c.o   -c /home/pi/rpi_ltc2983/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_1a724
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_1a724.dir/link.txt --verbose=1
+/usr/bin/cc       CMakeFiles/cmTC_1a724.dir/CheckSymbolExists.c.o  -o cmTC_1a724 -rdynamic 
+CMakeFiles/cmTC_1a724.dir/CheckSymbolExists.c.o: In function `main':
+CheckSymbolExists.c:(.text+0x38): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_1a724.dir/build.make:97: recipe for target 'cmTC_1a724' failed
+make[1]: Leaving directory '/home/pi/rpi_ltc2983/build/CMakeFiles/CMakeTmp'
+make[1]: *** [cmTC_1a724] Error 1
+Makefile:126: recipe for target 'cmTC_1a724/fast' failed
+make: *** [cmTC_1a724/fast] Error 2
+
+File /home/pi/rpi_ltc2983/build/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/pi/rpi_ltc2983/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_dc7aa/fast"
+/usr/bin/make -f CMakeFiles/cmTC_dc7aa.dir/build.make CMakeFiles/cmTC_dc7aa.dir/build
+make[1]: Entering directory '/home/pi/rpi_ltc2983/build/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_dc7aa.dir/CheckFunctionExists.c.o
+/usr/bin/cc    -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_dc7aa.dir/CheckFunctionExists.c.o   -c /usr/local/share/cmake-3.4/Modules/CheckFunctionExists.c
+Linking C executable cmTC_dc7aa
+/usr/local/bin/cmake -E cmake_link_script CMakeFiles/cmTC_dc7aa.dir/link.txt --verbose=1
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create    CMakeFiles/cmTC_dc7aa.dir/CheckFunctionExists.c.o  -o cmTC_dc7aa -rdynamic -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_dc7aa.dir/build.make:97: recipe for target 'cmTC_dc7aa' failed
+make[1]: *** [cmTC_dc7aa] Error 1
+make[1]: Leaving directory '/home/pi/rpi_ltc2983/build/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_dc7aa/fast' failed
+make: *** [cmTC_dc7aa/fast] Error 2
+
+
