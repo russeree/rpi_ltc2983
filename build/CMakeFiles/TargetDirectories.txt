@@ -1,1 +1,0 @@
-/home/pi/rpi_ltc2983/build/CMakeFiles/LTC2983_SERV.dir

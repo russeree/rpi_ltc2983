@@ -1,1 +1,0 @@
-/usr/bin/c++      CMakeFiles/LTC2983_SERV.dir/src/tcp_connection.cc.o CMakeFiles/LTC2983_SERV.dir/src/main.cc.o CMakeFiles/LTC2983_SERV.dir/src/tcp_server.cc.o CMakeFiles/LTC2983_SERV.dir/src/ltc2983.cc.o  -o LTC2983_SERV -rdynamic /usr/local/lib/libwiringPi.so -lpthread /usr/local/lib/libboost_system.so /usr/local/lib/libboost_thread.so -Wl,-rpath,/usr/local/lib 
