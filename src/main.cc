@@ -20,7 +20,7 @@
 #include <wiringPiSPI.h>
 
 // CREATED C LIBS
-#include "ltc2983.h"
+#include <ltc2983.hpp>
 
 int main(int argc, char *argv[])
 {

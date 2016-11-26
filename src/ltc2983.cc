@@ -10,7 +10,7 @@
 #include <wiringPi.h>
 #include <wiringPiSPI.h>
 // CREATED C LIBS
-#include "ltc2983.h"
+#include <ltc2983.hpp>
 
 /**
  * @desc: initializes the ltc2983
