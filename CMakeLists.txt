@@ -7,7 +7,7 @@ find_package(WiringPi REQUIRED)
 find_package(Threads REQUIRED)
 find_package(Boost 1.40 COMPONENTS system thread REQUIRED)
 #Include header files
-set(HEADER_FILES $("include/*.h"))
+set(HEADER_FILES $("include/*.hpp"))
 include_directories(${Boost_INCLUDE_DIR})
 include_directories(include)
 include_directories(include ${WIRINGPI_INCLUDE_DIRS}) 
