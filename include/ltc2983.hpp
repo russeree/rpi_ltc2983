@@ -1,25 +1,28 @@
 #ifndef LTC2983
 #define LTC2983
 
+#include <memory>
 #define VER_STRING "1.01a"
-class ltc2983
+
+class ltc2983 : public std::enable_shared_from_this<ltc2983>
 {
 public:
-  ltc2983(int spi_channel);
-  virtual ~ltc2983();
-  int get_command_status(void);
-  int read_data(unsigned short int address, unsigned char *results, unsigned int bytes);
-  int setup_thermocouple(unsigned int channel, unsigned char tc_type, unsigned char cj_assignment,  bool snl_ended, bool oc_chk, unsigned char oc_curr);
-  int setup_diode(unsigned int channel, bool snl_ended, bool three_readings, bool averaging, unsigned char exc_current, unsigned int ideality_f);
-  int write_all_channel_assignments(unsigned char *tx_buff);
-  int all_chnnel_conversion(void);
-  int channel_err_decode(int channel_number);
-  float read_channel_double(int channel_number);
-  void get_ver(void);
+    ltc2983(int spi_channel);
+    virtual ~ltc2983();
+    int get_command_status(void);
+    int read_data(unsigned short int address, unsigned char *results, unsigned int bytes);
+    int setup_thermocouple(unsigned int channel, unsigned char tc_type, unsigned char cj_assignment,  bool snl_ended, bool oc_chk, unsigned char oc_curr);
+    int setup_diode(unsigned int channel, bool snl_ended, bool three_readings, bool averaging, unsigned char exc_current, unsigned int ideality_f);
+    int write_all_channel_assignments(unsigned char *tx_buff);
+    int all_chnnel_conversion(void);
+    int channel_err_decode(int channel_number);
+    float read_channel_double(int channel_number);
+    void get_ver(void);
+    std::shared_ptr<ltc2983> getptr(void);
 protected:
-  int status;
-  int spi_channel;
-  unsigned int chnl_asgn_map [20] = {};
+    int status;
+    int spi_channel;
+    unsigned int chnl_asgn_map [20] = {};
 };
 
 // External Functions

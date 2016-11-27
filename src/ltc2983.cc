@@ -58,7 +58,16 @@ ltc2983::ltc2983(int spi_channel)
 /**
  * @desc: LTC2983 destructor
  **/
-ltc2983::~ltc2983(){}
+ltc2983::~ltc2983()
+{
+}
+/**
+ * @desc: Returns the shared porinter of ltc2983
+ **/
+std::shared_ptr<ltc2983> ltc2983::getptr(void)
+{
+    return shared_from_this();
+}
 /**
  * @desc: Read the Command Regiser and prints a Readable message if DEBUG is defined.
  **/
