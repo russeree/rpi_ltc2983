@@ -363,3 +363,16 @@ extern int gen_transaction(unsigned int *buff, unsigned char trans_type, unsigne
     }
     return 0;
 }
+
+/**
+ * @desc: Takes in a string: Idealy from the socket, and if the string = "LTC2983 -v" it will print out the version
+ * @param: [input] the input string to be tested
+ **/
+void ltc2983::get_ver(void)
+{
+#ifndef VER_STRING
+    std::cout << "Compiled without LTC2983 version.";
+#else
+    std::cout << "LTC2983 module version " << VER_STRING;
+#endif
+}

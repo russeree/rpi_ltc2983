@@ -1,6 +1,7 @@
 #ifndef LTC2983
 #define LTC2983
 
+#define VER_STRING "1.01a"
 class ltc2983
 {
 public:
@@ -14,6 +15,7 @@ public:
   int all_chnnel_conversion(void);
   int channel_err_decode(int channel_number);
   float read_channel_double(int channel_number);
+  void get_ver(void);
 protected:
   int status;
   int spi_channel;
