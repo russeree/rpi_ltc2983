@@ -5,15 +5,11 @@
 #include <fstream>
 
 // C LIBS
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
-#include <time.h>
 
 // OBTAINED C LIBS
 #include <wiringPi.h>
@@ -21,9 +17,20 @@
 
 // CREATED C LIBS
 #include <ltc2983.hpp>
+#include <tcp_server.hpp>
 
 int main(int argc, char *argv[])
 {
+    try
+    {
+        boost::asio::io_service io_service;
+        tcp_server server(io_service);
+        io_service.run();
+    }
+    catch (std::exception& e)
+    {
+        std::cerr << e.what () << std::endl;
+    }
     std::ofstream results;
     results.open("results.txt");
     const unsigned int d_ideality_f = 0x00101042; // Diode ideality factor of ~ 1.04
